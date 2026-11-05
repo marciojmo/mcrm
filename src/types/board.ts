@@ -1,0 +1,36 @@
+export interface BoardUser {
+  id: string;
+  name: string;
+  image: string | null;
+}
+
+export interface BoardLabel {
+  id: string;
+  name: string;
+  color: string;
+}
+
+export interface BoardTask {
+  id: string;
+  title: string;
+  description: string | null;
+  dueDate: string | null;
+  labelIds: string[];
+  memberIds: string[];
+  checklistDone: number;
+  checklistTotal: number;
+  attachmentCount: number;
+  commentCount: number;
+}
+
+export interface TaskDetails {
+  title: string;
+  description: string | null;
+  dueDate: string | null;
+}
+
+export interface BoardPanel {
+  id: string;
+  name: string;
+  tasks: BoardTask[];
+}

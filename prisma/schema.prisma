@@ -6,3 +6,179 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id            String       @id
+  name          String
+  email         String       @unique
+  emailVerified Boolean      @default(false) @map("email_verified")
+  image         String?
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  sessions      Session[]
+  accounts      Account[]
+  taskMembers   TaskMember[]
+  comments      Comment[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime @map("expires_at")
+  token     String   @unique
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  userId                String    @map("user_id")
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([identifier])
+  @@map("verifications")
+}
+
+model Panel {
+  id         String    @id @default(cuid())
+  name       String
+  position   Int
+  archivedAt DateTime? @map("archived_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  tasks      Task[]
+
+  @@map("panels")
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  dueDate     DateTime?    @map("due_date") @db.Date
+  position    Int
+  panelId     String       @map("panel_id")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  panel       Panel        @relation(fields: [panelId], references: [id], onDelete: Cascade)
+  labels      TaskLabel[]
+  members     TaskMember[]
+  checklists  Checklist[]
+  comments    Comment[]
+  attachments Attachment[]
+
+  @@index([panelId, position])
+  @@map("tasks")
+}
+
+model Label {
+  id        String      @id @default(cuid())
+  name      String
+  color     String
+  createdAt DateTime    @default(now()) @map("created_at")
+  tasks     TaskLabel[]
+
+  @@map("labels")
+}
+
+model TaskLabel {
+  taskId  String @map("task_id")
+  labelId String @map("label_id")
+  task    Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label   Label  @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, labelId])
+  @@map("task_labels")
+}
+
+model TaskMember {
+  taskId String @map("task_id")
+  userId String @map("user_id")
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+  @@map("task_members")
+}
+
+model Checklist {
+  id       String          @id @default(cuid())
+  title    String
+  position Int
+  taskId   String          @map("task_id")
+  task     Task            @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  items    ChecklistItem[]
+
+  @@index([taskId])
+  @@map("checklists")
+}
+
+model ChecklistItem {
+  id          String    @id @default(cuid())
+  text        String
+  isDone      Boolean   @default(false) @map("is_done")
+  position    Int
+  checklistId String    @map("checklist_id")
+  checklist   Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+
+  @@index([checklistId])
+  @@map("checklist_items")
+}
+
+model Comment {
+  id               String   @id @default(cuid())
+  body             String
+  mentionedUserIds String[] @map("mentioned_user_ids")
+  taskId           String   @map("task_id")
+  authorId         String   @map("author_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  task             Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author           User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("comments")
+}
+
+model Attachment {
+  id         String   @id @default(cuid())
+  name       String
+  url        String?
+  storedName String?  @map("stored_name")
+  mimeType   String?  @map("mime_type")
+  size       Int?
+  taskId     String   @map("task_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("attachments")
+}
