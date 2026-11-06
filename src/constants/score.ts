@@ -1,0 +1,3 @@
+export const POINTS_PER_COMPLETED_TASK = 10;
+export const POINTS_PER_OPEN_TASK = 1;
+export const PENALTY_PER_OVERDUE_TASK = 5;
