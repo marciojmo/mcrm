@@ -40,6 +40,17 @@ export async function updateComment(
   if (count === 0) throw new Error('Comment not found');
 }
 
+export async function markMentionSeen(commentId: string, userId: string) {
+  await prisma.comment.updateMany({
+    where: {
+      id: commentId,
+      mentionedUserIds: { has: userId },
+      NOT: { seenByUserIds: { has: userId } },
+    },
+    data: { seenByUserIds: { push: userId } },
+  });
+}
+
 export async function deleteComment(commentId: string, authorId: string) {
   const { count } = await prisma.comment.deleteMany({
     where: { id: commentId, authorId },

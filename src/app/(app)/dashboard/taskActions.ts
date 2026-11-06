@@ -52,6 +52,7 @@ function cleanUrl(value: string) {
 
 async function refresh() {
   revalidatePath('/dashboard');
+  revalidatePath('/home');
 }
 
 export async function getTaskExtras(taskId: string) {

@@ -28,7 +28,7 @@ export async function getHomeOverview(userId: string): Promise<HomeOverview> {
       prisma.comment.findMany({
         where: {
           mentionedUserIds: { has: userId },
-          authorId: { not: userId },
+          NOT: { seenByUserIds: { has: userId } },
           task: { archivedAt: null },
         },
         orderBy: { createdAt: 'desc' },

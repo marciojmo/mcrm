@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { MarkMentionSeenButton } from '@/components/features/home/MarkMentionSeenButton';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { formatDueDate } from '@/lib/formatDueDate';
 import { cn } from '@/lib/utils';
@@ -82,10 +83,13 @@ export function HomeOverview({
         ) : (
           <ul className="flex max-w-xl flex-col gap-2">
             {overview.mentions.map((mention) => (
-              <li key={mention.id}>
+              <li
+                key={mention.id}
+                className="flex items-center gap-1 rounded-lg bg-card pr-2 ring-1 ring-foreground/10"
+              >
                 <Link
                   href={`/dashboard?task=${mention.taskId}&comment=${mention.id}`}
-                  className="flex gap-3 rounded-lg bg-card p-3 text-sm ring-1 ring-foreground/10 hover:bg-muted"
+                  className="flex min-w-0 flex-1 gap-3 rounded-lg p-3 text-sm hover:bg-muted"
                 >
                   <UserAvatar user={mention.author} />
                   <span className="flex min-w-0 flex-col gap-0.5">
@@ -102,6 +106,7 @@ export function HomeOverview({
                     </span>
                   </span>
                 </Link>
+                <MarkMentionSeenButton commentId={mention.id} />
               </li>
             ))}
           </ul>
