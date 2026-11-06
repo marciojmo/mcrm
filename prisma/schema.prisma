@@ -18,6 +18,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   taskMembers   TaskMember[]
+  taskFollowers TaskFollower[]
   comments      Comment[]
 
   @@map("users")
@@ -89,9 +90,11 @@ model Task {
   position    Int
   panelId     String       @map("panel_id")
   createdAt   DateTime     @default(now()) @map("created_at")
+  archivedAt  DateTime?    @map("archived_at")
   panel       Panel        @relation(fields: [panelId], references: [id], onDelete: Cascade)
   labels      TaskLabel[]
   members     TaskMember[]
+  followers   TaskFollower[]
   checklists  Checklist[]
   comments    Comment[]
   attachments Attachment[]
@@ -128,6 +131,16 @@ model TaskMember {
 
   @@id([taskId, userId])
   @@map("task_members")
+}
+
+model TaskFollower {
+  taskId String @map("task_id")
+  userId String @map("user_id")
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+  @@map("task_followers")
 }
 
 model Checklist {

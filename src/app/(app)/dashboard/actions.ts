@@ -10,8 +10,11 @@ import {
   reorderPanels as reorderPanelRecords,
 } from '@/services/panelService';
 import {
+  archiveTask as archiveTaskRecord,
   createTask as createTaskRecord,
+  duplicateTask as duplicateTaskRecord,
   moveTask as moveTaskRecord,
+  toggleTaskFollower as toggleTaskFollowerRecord,
   updateTask as updateTaskRecord,
 } from '@/services/taskService';
 
@@ -70,5 +73,23 @@ export async function updateTask(taskId: string, details: TaskDetails) {
         ? details.dueDate
         : null,
   });
+  revalidatePath('/dashboard');
+}
+
+export async function archiveTask(taskId: string) {
+  await requireSession();
+  await archiveTaskRecord(taskId);
+  revalidatePath('/dashboard');
+}
+
+export async function duplicateTask(taskId: string) {
+  await requireSession();
+  await duplicateTaskRecord(taskId);
+  revalidatePath('/dashboard');
+}
+
+export async function toggleTaskFollower(taskId: string) {
+  const { user } = await requireSession();
+  await toggleTaskFollowerRecord(taskId, user.id);
   revalidatePath('/dashboard');
 }

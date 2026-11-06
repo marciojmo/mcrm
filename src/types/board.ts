@@ -17,6 +17,7 @@ export interface BoardTask {
   dueDate: string | null;
   labelIds: string[];
   memberIds: string[];
+  followerIds: string[];
   checklistDone: number;
   checklistTotal: number;
   attachmentCount: number;

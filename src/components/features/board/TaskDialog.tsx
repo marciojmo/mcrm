@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { EyeIcon } from 'lucide-react';
 import { updateTask } from '@/app/(app)/dashboard/actions';
 import { LabelChip } from '@/components/features/board/LabelChip';
 import { AddAttachmentPopover } from '@/components/features/board/task/AddAttachmentPopover';
@@ -10,6 +11,7 @@ import { ChecklistBlock } from '@/components/features/board/task/ChecklistBlock'
 import { CommentsSection } from '@/components/features/board/task/CommentsSection';
 import { LabelsPopover } from '@/components/features/board/task/LabelsPopover';
 import { MembersPopover } from '@/components/features/board/task/MembersPopover';
+import { TaskMenu } from '@/components/features/board/task/TaskMenu';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
@@ -45,6 +47,7 @@ export function TaskDialog({
   const [, startTransition] = useTransition();
   const { extras, reload } = useTaskExtras(task.id);
   const taskLabels = labels.filter((label) => task.labelIds.includes(label.id));
+  const isFollowing = task.followerIds.includes(currentUserId);
   const members = users.filter((user) => task.memberIds.includes(user.id));
 
   function save(changes: Partial<TaskDetails>) {
@@ -88,6 +91,12 @@ export function TaskDialog({
                 }
               />
             </label>
+            {isFollowing && (
+              <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                <EyeIcon className="size-4" />
+                Seguindo
+              </span>
+            )}
           </div>
           {(members.length > 0 || taskLabels.length > 0) && (
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
@@ -143,6 +152,11 @@ export function TaskDialog({
             onChange={reload}
           />
         </aside>
+        <TaskMenu
+          taskId={task.id}
+          isFollowing={isFollowing}
+          onClose={onClose}
+        />
       </DialogContent>
     </Dialog>
   );

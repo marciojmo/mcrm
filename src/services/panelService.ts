@@ -9,6 +9,7 @@ export async function listPanels(): Promise<BoardPanel[]> {
       id: true,
       name: true,
       tasks: {
+        where: { archivedAt: null },
         orderBy: { position: 'asc' },
         select: {
           id: true,
@@ -17,6 +18,7 @@ export async function listPanels(): Promise<BoardPanel[]> {
           dueDate: true,
           labels: { select: { labelId: true } },
           members: { select: { userId: true } },
+          followers: { select: { userId: true } },
           checklists: { select: { items: { select: { isDone: true } } } },
           _count: { select: { comments: true, attachments: true } },
         },
@@ -35,6 +37,7 @@ export async function listPanels(): Promise<BoardPanel[]> {
         dueDate: task.dueDate?.toISOString().slice(0, 10) ?? null,
         labelIds: task.labels.map((label) => label.labelId),
         memberIds: task.members.map((member) => member.userId),
+        followerIds: task.followers.map((follower) => follower.userId),
         checklistDone: items.filter((item) => item.isDone).length,
         checklistTotal: items.length,
         attachmentCount: task._count.attachments,
