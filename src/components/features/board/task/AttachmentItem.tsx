@@ -49,13 +49,20 @@ export function AttachmentItem({ attachment, onChange }: AttachmentItemProps) {
         </a>
       )}
       <div className="flex min-w-0 flex-1 flex-col">
-        <button
-          className="truncate font-medium hover:underline text-left"
-          aria-label={`Visualizar ${attachment.name}`}
-          onClick={() => setIsImageOpen(true)}
-        >
-          {attachment.name}
-        </button>
+        {imageUrl ? (
+          <button
+            type="button"
+            className="truncate text-left font-medium hover:underline"
+            aria-label={`Visualizar ${attachment.name}`}
+            onClick={() => setIsImageOpen(true)}
+          >
+            {attachment.name}
+          </button>
+        ) : (
+          <a {...linkProps} className="truncate font-medium hover:underline">
+            {attachment.name}
+          </a>
+        )}
         <span className="text-xs text-muted-foreground">
           {isDrive && 'Google Drive'}
           {attachment.size !== null && formatSize(attachment.size)}
