@@ -19,6 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { useToast } from '@/components/ui/Toast';
 
 interface TaskMenuProps {
   taskId: string;
@@ -29,6 +30,7 @@ interface TaskMenuProps {
 export function TaskMenu({ taskId, isFollowing, onClose }: TaskMenuProps) {
   const [isArchiving, setIsArchiving] = useState(false);
   const [, startTransition] = useTransition();
+  const toast = useToast();
 
   return (
     <>
@@ -47,7 +49,14 @@ export function TaskMenu({ taskId, isFollowing, onClose }: TaskMenuProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem
-            onClick={() => startTransition(() => toggleTaskFollower(taskId))}
+            onClick={() =>
+              startTransition(async () => {
+                await toggleTaskFollower(taskId);
+                toast.add({
+                  title: isFollowing ? 'Deixou de seguir' : 'Seguindo Tarefa',
+                });
+              })
+            }
           >
             <EyeIcon />
             {isFollowing ? 'Deixar de seguir' : 'Seguir'}
@@ -56,6 +65,7 @@ export function TaskMenu({ taskId, isFollowing, onClose }: TaskMenuProps) {
             onClick={() =>
               startTransition(async () => {
                 await duplicateTask(taskId);
+                toast.add({ title: 'Tarefa duplicada!' });
                 onClose();
               })
             }
