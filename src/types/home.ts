@@ -1,5 +1,7 @@
 import type { BoardUser } from '@/types/board';
 
+export type HomeView = 'overview' | 'notifications' | 'deadlines';
+
 export interface HomeDeadline {
   id: string;
   title: string;
@@ -14,11 +16,26 @@ export interface HomeMention {
   taskId: string;
   taskTitle: string;
   author: BoardUser;
+  isSeen: boolean;
+}
+
+export interface TaskStats {
+  overdueCount: number;
+  openCount: number;
+  completedCount: number;
+  score: number;
+}
+
+export interface TopScorer {
+  name: string;
+  score: number;
 }
 
 export interface HomeOverview {
-  completedCount: number;
-  pendingCount: number;
+  userName: string;
+  stats: TaskStats;
+  teamAverageScore: number;
+  topScorer: TopScorer | null;
   deadlines: HomeDeadline[];
   mentions: HomeMention[];
 }
