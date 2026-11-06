@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { closestCorners, DndContext, DragOverlay } from '@dnd-kit/core';
 import {
   horizontalListSortingStrategy,
@@ -37,7 +38,13 @@ export function Board({
     setSyncedPanels(serverPanels);
     setPanels(serverPanels);
   }
+  const { bfcacheId } = useRouter();
   const [openTaskId, setOpenTaskId] = useState(initialTaskId);
+  const [syncedBfcacheId, setSyncedBfcacheId] = useState(bfcacheId);
+  if (bfcacheId !== syncedBfcacheId) {
+    setSyncedBfcacheId(bfcacheId);
+    setOpenTaskId(initialTaskId);
+  }
   const openTask = panels
     .flatMap((panel) => panel.tasks)
     .find((task) => task.id === openTaskId);
