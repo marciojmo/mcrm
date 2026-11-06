@@ -63,6 +63,13 @@ export async function moveTask(
   });
 }
 
+export async function setTaskCompleted(taskId: string, isCompleted: boolean) {
+  return prisma.task.update({
+    where: { id: taskId },
+    data: { completedAt: isCompleted ? new Date() : null },
+  });
+}
+
 export async function toggleTaskFollower(taskId: string, userId: string) {
   const key = { taskId_userId: { taskId, userId } };
   const existing = await prisma.taskFollower.findUnique({ where: key });

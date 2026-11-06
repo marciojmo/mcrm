@@ -12,10 +12,12 @@ import { CommentsSection } from '@/components/features/board/task/CommentsSectio
 import { LabelsPopover } from '@/components/features/board/task/LabelsPopover';
 import { MembersPopover } from '@/components/features/board/task/MembersPopover';
 import { TaskMenu } from '@/components/features/board/task/TaskMenu';
+import { TaskCheckbox } from '@/components/features/board/TaskCheckbox';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { useTaskCompletion } from '@/hooks/useTaskCompletion';
 import { useTaskExtras } from '@/hooks/useTaskExtras';
 import type {
   BoardLabel,
@@ -29,6 +31,7 @@ interface TaskDialogProps {
   users: BoardUser[];
   labels: BoardLabel[];
   currentUserId: string;
+  highlightCommentId: string | null;
   onClose: () => void;
 }
 
@@ -37,6 +40,7 @@ export function TaskDialog({
   users,
   labels,
   currentUserId,
+  highlightCommentId,
   onClose,
 }: TaskDialogProps) {
   const [details, setDetails] = useState<TaskDetails>({
@@ -46,6 +50,7 @@ export function TaskDialog({
   });
   const [, startTransition] = useTransition();
   const { extras, reload } = useTaskExtras(task.id);
+  const completion = useTaskCompletion(task.id, task.isCompleted);
   const taskLabels = labels.filter((label) => task.labelIds.includes(label.id));
   const isFollowing = task.followerIds.includes(currentUserId);
   const members = users.filter((user) => task.memberIds.includes(user.id));
@@ -65,16 +70,23 @@ export function TaskDialog({
       <DialogContent className="flex h-[80vh] w-[80vw] max-w-none gap-0 p-0 sm:max-w-none">
         <DialogTitle className="sr-only">Detalhes da tarefa</DialogTitle>
         <div className="flex min-h-0 w-[65%] flex-col gap-4 p-4">
-          <Input
-            value={details.title}
-            maxLength={200}
-            aria-label="Título"
-            className="h-auto border-transparent bg-transparent py-1 pr-10 text-xl font-semibold shadow-none hover:bg-muted focus-visible:bg-transparent"
-            onChange={(event) =>
-              setDetails({ ...details, title: event.target.value })
-            }
-            onBlur={() => save({})}
-          />
+          <div className="flex items-center gap-2">
+            <TaskCheckbox
+              isCompleted={completion.isCompleted}
+              isAlwaysVisible
+              onToggle={completion.toggle}
+            />
+            <Input
+              value={details.title}
+              maxLength={200}
+              aria-label="Título"
+              className="h-auto flex-1 border-transparent bg-transparent py-1 pr-10 text-xl font-semibold shadow-none hover:bg-muted focus-visible:bg-transparent"
+              onChange={(event) =>
+                setDetails({ ...details, title: event.target.value })
+              }
+              onBlur={() => save({})}
+            />
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <LabelsPopover task={task} labels={labels} />
             <MembersPopover task={task} users={users} />
@@ -148,6 +160,7 @@ export function TaskDialog({
             taskId={task.id}
             users={users}
             currentUserId={currentUserId}
+            highlightCommentId={highlightCommentId}
             comments={extras?.comments ?? []}
             onChange={reload}
           />

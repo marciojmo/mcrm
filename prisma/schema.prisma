@@ -91,6 +91,7 @@ model Task {
   panelId     String       @map("panel_id")
   createdAt   DateTime     @default(now()) @map("created_at")
   archivedAt  DateTime?    @map("archived_at")
+  completedAt DateTime?    @map("completed_at")
   panel       Panel        @relation(fields: [panelId], references: [id], onDelete: Cascade)
   labels      TaskLabel[]
   members     TaskMember[]

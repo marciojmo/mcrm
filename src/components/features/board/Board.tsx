@@ -19,6 +19,8 @@ interface BoardProps {
   users: BoardUser[];
   labels: BoardLabel[];
   currentUserId: string;
+  initialTaskId: string | null;
+  highlightCommentId: string | null;
 }
 
 export function Board({
@@ -26,6 +28,8 @@ export function Board({
   users,
   labels,
   currentUserId,
+  initialTaskId,
+  highlightCommentId,
 }: BoardProps) {
   const [panels, setPanels] = useState(serverPanels);
   const [syncedPanels, setSyncedPanels] = useState(serverPanels);
@@ -33,7 +37,7 @@ export function Board({
     setSyncedPanels(serverPanels);
     setPanels(serverPanels);
   }
-  const [openTaskId, setOpenTaskId] = useState<string | null>(null);
+  const [openTaskId, setOpenTaskId] = useState(initialTaskId);
   const openTask = panels
     .flatMap((panel) => panel.tasks)
     .find((task) => task.id === openTaskId);
@@ -89,6 +93,7 @@ export function Board({
           users={users}
           labels={labels}
           currentUserId={currentUserId}
+          highlightCommentId={highlightCommentId}
           onClose={() => setOpenTaskId(null)}
         />
       )}

@@ -15,6 +15,7 @@ export interface BoardTask {
   title: string;
   description: string | null;
   dueDate: string | null;
+  isCompleted: boolean;
   labelIds: string[];
   memberIds: string[];
   followerIds: string[];

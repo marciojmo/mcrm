@@ -2,10 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpenIcon, BriefcaseIcon, SettingsIcon } from 'lucide-react';
+import {
+  BookOpenIcon,
+  BriefcaseIcon,
+  HomeIcon,
+  SettingsIcon,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
+  { href: '/home', label: 'Início', Icon: HomeIcon },
   { href: '/dashboard', label: 'Trabalho', Icon: BriefcaseIcon },
   { href: '/wiki', label: 'Wiki', Icon: BookOpenIcon },
   { href: '/settings', label: 'Configurações', Icon: SettingsIcon },

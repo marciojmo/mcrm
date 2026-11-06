@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import {
   deleteComment,
   updateComment,
@@ -8,6 +8,7 @@ import {
 import { MentionTextarea } from '@/components/features/board/task/MentionTextarea';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Button } from '@/components/ui/Button';
+import { cn } from '@/lib/utils';
 import type { BoardUser } from '@/types/board';
 import type { TaskComment } from '@/types/task';
 
@@ -15,6 +16,7 @@ interface CommentItemProps {
   comment: TaskComment;
   users: BoardUser[];
   currentUserId: string;
+  isHighlighted: boolean;
   onChange: () => Promise<void>;
 }
 
@@ -45,8 +47,13 @@ export function CommentItem({
   comment,
   users,
   currentUserId,
+  isHighlighted,
   onChange,
 }: CommentItemProps) {
+  const itemRef = useRef<HTMLLIElement>(null);
+  useEffect(() => {
+    if (isHighlighted) itemRef.current?.scrollIntoView({ block: 'center' });
+  }, [isHighlighted]);
   const [isEditing, setIsEditing] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [body, setBody] = useState(comment.body);
@@ -63,7 +70,13 @@ export function CommentItem({
   }
 
   return (
-    <li className="flex gap-2 text-sm">
+    <li
+      ref={itemRef}
+      className={cn(
+        'flex gap-2 rounded-lg text-sm',
+        isHighlighted && 'animate-comment-highlight'
+      )}
+    >
       <UserAvatar user={comment.author} />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="font-medium">

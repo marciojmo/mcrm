@@ -14,6 +14,7 @@ import {
   createTask as createTaskRecord,
   duplicateTask as duplicateTaskRecord,
   moveTask as moveTaskRecord,
+  setTaskCompleted as setTaskCompletedRecord,
   toggleTaskFollower as toggleTaskFollowerRecord,
   updateTask as updateTaskRecord,
 } from '@/services/taskService';
@@ -92,4 +93,11 @@ export async function toggleTaskFollower(taskId: string) {
   const { user } = await requireSession();
   await toggleTaskFollowerRecord(taskId, user.id);
   revalidatePath('/dashboard');
+}
+
+export async function setTaskCompleted(taskId: string, isCompleted: boolean) {
+  await requireSession();
+  await setTaskCompletedRecord(taskId, isCompleted);
+  revalidatePath('/dashboard');
+  revalidatePath('/home');
 }

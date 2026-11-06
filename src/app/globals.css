@@ -128,3 +128,16 @@
     @apply font-sans;
   }
 }
+
+@keyframes comment-highlight {
+  from {
+    background-color: color-mix(in oklab, var(--primary) 30%, transparent);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.animate-comment-highlight {
+  animation: comment-highlight 2.5s ease-out;
+}

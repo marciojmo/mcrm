@@ -12,6 +12,7 @@ interface CommentsSectionProps {
   taskId: string;
   users: BoardUser[];
   currentUserId: string;
+  highlightCommentId: string | null;
   comments: TaskComment[];
   onChange: () => Promise<void>;
 }
@@ -20,6 +21,7 @@ export function CommentsSection({
   taskId,
   users,
   currentUserId,
+  highlightCommentId,
   comments,
   onChange,
 }: CommentsSectionProps) {
@@ -64,6 +66,7 @@ export function CommentsSection({
             comment={comment}
             users={users}
             currentUserId={currentUserId}
+            isHighlighted={comment.id === highlightCommentId}
             onChange={onChange}
           />
         ))}

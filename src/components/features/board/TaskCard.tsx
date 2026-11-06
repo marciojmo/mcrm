@@ -5,6 +5,7 @@ import {
   SquareCheckIcon,
 } from 'lucide-react';
 import { forwardRef, type HTMLAttributes } from 'react';
+import { TaskCheckbox } from '@/components/features/board/TaskCheckbox';
 import { LabelChip } from '@/components/features/board/LabelChip';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { formatDueDate } from '@/lib/formatDueDate';
@@ -17,6 +18,7 @@ interface TaskCardProps extends HTMLAttributes<HTMLDivElement> {
   labels: BoardLabel[];
   isGhost?: boolean;
   isOverlay?: boolean;
+  onToggleCompleted?: () => void;
 }
 
 export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
@@ -27,6 +29,7 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
       labels,
       isGhost = false,
       isOverlay = false,
+      onToggleCompleted,
       className,
       ...props
     },
@@ -41,7 +44,7 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
       <div
         ref={ref}
         className={cn(
-          'flex items-start justify-between gap-2 rounded-lg bg-card p-3 text-sm shadow-sm ring-1 ring-foreground/10',
+          'group/task flex items-start justify-between gap-2 rounded-lg bg-card p-3 text-sm shadow-sm ring-1 ring-foreground/10',
           isGhost && 'opacity-40',
           isOverlay && 'rotate-2 cursor-grabbing shadow-lg',
           className
@@ -56,7 +59,24 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
               ))}
             </div>
           )}
-          <span className="break-words">{task.title}</span>
+          <div className="relative">
+            {onToggleCompleted && (
+              <TaskCheckbox
+                isCompleted={task.isCompleted}
+                onToggle={onToggleCompleted}
+                className="absolute top-0.5 left-0"
+              />
+            )}
+            <span
+              className={cn(
+                'block break-words transition-transform duration-300',
+                onToggleCompleted && 'group-hover/task:translate-x-6',
+                onToggleCompleted && task.isCompleted && 'translate-x-6'
+              )}
+            >
+              {task.title}
+            </span>
+          </div>
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             {task.dueDate && (
               <span className="flex items-center gap-1">
