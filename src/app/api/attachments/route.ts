@@ -18,6 +18,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'File too large' }, { status: 413 });
   }
   await addFileAttachment(taskId, file);
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
   return NextResponse.json({ ok: true });
 }
