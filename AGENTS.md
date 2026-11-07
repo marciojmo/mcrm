@@ -68,6 +68,11 @@ Código, nomes e commits em inglês.
 - `npm run check` roda lint, typecheck e formatação. Precisa passar antes de qualquer entrega.
 - Mudou o `schema.prisma`? Rode `npx prisma migrate dev --name <descricao>`.
 
+## Fluxo de git
+
+- Toda feature grande começa em uma branch nova a partir da `main` atualizada: `git switch main && git pull && git switch -c feat/<nome>`.
+- Ao terminar, faça push da branch e abra um pull request para a `main`. Nada de merge direto na `main`.
+
 <!-- mstack:end -->
 
 <!-- BEGIN:nextjs-agent-rules -->
