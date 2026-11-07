@@ -8,18 +8,20 @@ datasource db {
 }
 
 model User {
-  id            String       @id
-  name          String
-  email         String       @unique
-  emailVerified Boolean      @default(false) @map("email_verified")
-  image         String?
-  createdAt     DateTime     @default(now()) @map("created_at")
-  updatedAt     DateTime     @updatedAt @map("updated_at")
-  sessions      Session[]
-  accounts      Account[]
-  taskMembers   TaskMember[]
-  taskFollowers TaskFollower[]
-  comments      Comment[]
+  id               String         @id
+  name             String
+  email            String         @unique
+  emailVerified    Boolean        @default(false) @map("email_verified")
+  image            String?
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  sessions         Session[]
+  accounts         Account[]
+  taskMembers      TaskMember[]
+  taskFollowers    TaskFollower[]
+  comments         Comment[]
+  boards           Board[]
+  boardMemberships BoardMember[]
 
   @@map("users")
 }
@@ -71,28 +73,55 @@ model Verification {
   @@map("verifications")
 }
 
+model Board {
+  id         String        @id @default(cuid())
+  name       String
+  ownerId    String        @map("owner_id")
+  archivedAt DateTime?     @map("archived_at")
+  createdAt  DateTime      @default(now()) @map("created_at")
+  owner      User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members    BoardMember[]
+  panels     Panel[]
+
+  @@index([ownerId])
+  @@map("boards")
+}
+
+model BoardMember {
+  boardId String @map("board_id")
+  userId  String @map("user_id")
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([boardId, userId])
+  @@map("board_members")
+}
+
 model Panel {
   id         String    @id @default(cuid())
   name       String
   position   Int
+  boardId    String    @map("board_id")
   archivedAt DateTime? @map("archived_at")
   createdAt  DateTime  @default(now()) @map("created_at")
+  board      Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
   tasks      Task[]
 
+  @@index([boardId])
   @@map("panels")
 }
 
 model Task {
-  id          String       @id @default(cuid())
+  id          String         @id @default(cuid())
   title       String
   description String?
-  dueDate     DateTime?    @map("due_date") @db.Date
+  dueDate     DateTime?      @map("due_date") @db.Date
   position    Int
-  panelId     String       @map("panel_id")
-  createdAt   DateTime     @default(now()) @map("created_at")
-  archivedAt  DateTime?    @map("archived_at")
-  completedAt DateTime?    @map("completed_at")
-  panel       Panel        @relation(fields: [panelId], references: [id], onDelete: Cascade)
+  panelId     String         @map("panel_id")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  archivedAt  DateTime?      @map("archived_at")
+  completedAt DateTime?      @map("completed_at")
+  panel       Panel          @relation(fields: [panelId], references: [id], onDelete: Cascade)
   labels      TaskLabel[]
   members     TaskMember[]
   followers   TaskFollower[]

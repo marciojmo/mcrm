@@ -36,3 +36,12 @@ export interface BoardPanel {
   name: string;
   tasks: BoardTask[];
 }
+
+export interface BoardSummary {
+  id: string;
+  name: string;
+}
+
+export interface BoardDetails extends BoardSummary {
+  ownerId: string;
+}

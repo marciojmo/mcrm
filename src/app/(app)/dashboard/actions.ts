@@ -1,8 +1,14 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import type { TaskDetails } from '@/types/board';
 import { requireSession } from '@/services/sessionService';
+import {
+  addBoardMember as addBoardMemberRecord,
+  archiveBoard as archiveBoardRecord,
+  createBoard as createBoardRecord,
+} from '@/services/boardService';
 import {
   archivePanel as archivePanelRecord,
   createPanel as createPanelRecord,
@@ -28,40 +34,60 @@ function cleanText(value: string) {
   return text;
 }
 
-export async function createPanel(name: string) {
+export async function createBoard(name: string) {
+  const { user } = await requireSession();
+  const board = await createBoardRecord(cleanText(name), user.id);
+  revalidatePath('/dashboard', 'layout');
+  redirect(`/dashboard/${board.id}`);
+}
+
+export async function addBoardMember(boardId: string, userId: string) {
+  const { user } = await requireSession();
+  await addBoardMemberRecord(boardId, user.id, userId);
+  revalidatePath('/dashboard', 'layout');
+}
+
+export async function archiveBoard(boardId: string) {
+  const { user } = await requireSession();
+  await archiveBoardRecord(boardId, user.id);
+  revalidatePath('/dashboard', 'layout');
+  redirect('/dashboard');
+}
+
+export async function createPanel(boardId: string, name: string) {
   await requireSession();
-  await createPanelRecord(cleanText(name));
-  revalidatePath('/dashboard');
+  await createPanelRecord(boardId, cleanText(name));
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function reorderPanels(panelIds: string[]) {
   await requireSession();
   await reorderPanelRecords(panelIds);
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function createTask(panelId: string, title: string) {
   await requireSession();
   await createTaskRecord(panelId, cleanText(title));
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function moveTask(taskId: string, panelId: string, index: number) {
   await requireSession();
   await moveTaskRecord(taskId, panelId, index);
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function renamePanel(panelId: string, name: string) {
   await requireSession();
   await renamePanelRecord(panelId, cleanText(name));
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function archivePanel(panelId: string) {
   await requireSession();
   await archivePanelRecord(panelId);
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function updateTask(taskId: string, details: TaskDetails) {
@@ -74,30 +100,30 @@ export async function updateTask(taskId: string, details: TaskDetails) {
         ? details.dueDate
         : null,
   });
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function archiveTask(taskId: string) {
   await requireSession();
   await archiveTaskRecord(taskId);
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function duplicateTask(taskId: string) {
   await requireSession();
   await duplicateTaskRecord(taskId);
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function toggleTaskFollower(taskId: string) {
   const { user } = await requireSession();
   await toggleTaskFollowerRecord(taskId, user.id);
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function setTaskCompleted(taskId: string, isCompleted: boolean) {
   await requireSession();
   await setTaskCompletedRecord(taskId, isCompleted);
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
   revalidatePath('/home');
 }

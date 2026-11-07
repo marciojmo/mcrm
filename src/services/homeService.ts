@@ -11,7 +11,12 @@ async function getTeamScores(today: string) {
       id: true,
       name: true,
       taskMembers: {
-        where: { task: { archivedAt: null, panel: { archivedAt: null } } },
+        where: {
+          task: {
+            archivedAt: null,
+            panel: { archivedAt: null, board: { archivedAt: null } },
+          },
+        },
         select: { task: { select: { completedAt: true, dueDate: true } } },
       },
     },
@@ -38,7 +43,7 @@ export async function getHomeOverview(
     prisma.task.findMany({
       where: {
         archivedAt: null,
-        panel: { archivedAt: null },
+        panel: { archivedAt: null, board: { archivedAt: null } },
         members: { some: { userId } },
         completedAt: null,
         dueDate: { not: null },

@@ -51,7 +51,7 @@ function cleanUrl(value: string) {
 }
 
 async function refresh() {
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
   revalidatePath('/home');
 }
 

@@ -1,33 +1,25 @@
 import { Suspense } from 'react';
-import { Board } from '@/components/features/board/Board';
-import { listLabels } from '@/services/labelService';
-import { listPanels } from '@/services/panelService';
+import { redirect } from 'next/navigation';
+import { BoardGrid } from '@/components/features/board/BoardGrid';
+import { getTaskBoardId, listBoards } from '@/services/boardService';
 import { requireSession } from '@/services/sessionService';
-import { listUsers } from '@/services/userService';
 import DashboardLoading from './loading';
 
-async function Dashboard({
+async function Boards({
   searchParams,
 }: {
   searchParams: PageProps<'/dashboard'>['searchParams'];
 }) {
   const { task, comment } = await searchParams;
+  const taskId = typeof task === 'string' ? task : null;
+  const boardId = taskId && (await getTaskBoardId(taskId));
+  if (boardId) {
+    const query = new URLSearchParams({ task: taskId });
+    if (typeof comment === 'string') query.set('comment', comment);
+    redirect(`/dashboard/${boardId}?${query}`);
+  }
   const { user } = await requireSession();
-  const [panels, users, labels] = await Promise.all([
-    listPanels(),
-    listUsers(),
-    listLabels(),
-  ]);
-  return (
-    <Board
-      panels={panels}
-      users={users}
-      labels={labels}
-      currentUserId={user.id}
-      initialTaskId={typeof task === 'string' ? task : null}
-      highlightCommentId={typeof comment === 'string' ? comment : null}
-    />
-  );
+  return <BoardGrid boards={await listBoards(user.id)} />;
 }
 
 export default function DashboardPage({
@@ -35,7 +27,7 @@ export default function DashboardPage({
 }: PageProps<'/dashboard'>) {
   return (
     <Suspense fallback={<DashboardLoading />}>
-      <Dashboard searchParams={searchParams} />
+      <Boards searchParams={searchParams} />
     </Suspense>
   );
 }

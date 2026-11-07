@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import type { BoardPanel } from '@/types/board';
 
-export async function listPanels(): Promise<BoardPanel[]> {
+export async function listPanels(boardId: string): Promise<BoardPanel[]> {
   const panels = await prisma.panel.findMany({
-    where: { archivedAt: null },
+    where: { boardId, archivedAt: null },
     orderBy: { position: 'asc' },
     select: {
       id: true,
@@ -49,9 +49,9 @@ export async function listPanels(): Promise<BoardPanel[]> {
   }));
 }
 
-export async function createPanel(name: string) {
-  const position = await prisma.panel.count();
-  return prisma.panel.create({ data: { name, position } });
+export async function createPanel(boardId: string, name: string) {
+  const position = await prisma.panel.count({ where: { boardId } });
+  return prisma.panel.create({ data: { boardId, name, position } });
 }
 
 export async function reorderPanels(panelIds: string[]) {

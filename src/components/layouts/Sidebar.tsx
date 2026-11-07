@@ -9,6 +9,7 @@ import {
   SettingsIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { BoardSummary } from '@/types/board';
 
 const NAV_ITEMS = [
   { href: '/home', label: 'Início', Icon: HomeIcon },
@@ -17,7 +18,11 @@ const NAV_ITEMS = [
   { href: '/settings', label: 'Configurações', Icon: SettingsIcon },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  boards: BoardSummary[];
+}
+
+export function Sidebar({ boards }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -25,18 +30,39 @@ export function Sidebar() {
       <span className="px-2 py-1 text-lg font-semibold">MCRM</span>
       <nav className="flex flex-col gap-1">
         {NAV_ITEMS.map(({ href, label, Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            aria-current={pathname.startsWith(href) ? 'page' : undefined}
-            className={cn(
-              'flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-muted',
-              pathname.startsWith(href) && 'bg-muted font-medium'
+          <div key={href} className="flex flex-col gap-1">
+            <Link
+              href={href}
+              aria-current={pathname.startsWith(href) ? 'page' : undefined}
+              className={cn(
+                'flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-muted',
+                pathname.startsWith(href) && 'bg-muted font-medium'
+              )}
+            >
+              <Icon className="size-4" />
+              {label}
+            </Link>
+            {href === '/dashboard' && (
+              <div className="ml-4 flex flex-col gap-1">
+                {boards.map((board) => (
+                  <Link
+                    key={board.id}
+                    href={`/dashboard/${board.id}`}
+                    aria-current={
+                      pathname === `/dashboard/${board.id}` ? 'page' : undefined
+                    }
+                    className={cn(
+                      'truncate rounded-lg px-2 py-1 text-sm hover:bg-muted',
+                      pathname === `/dashboard/${board.id}` &&
+                        'bg-muted font-medium'
+                    )}
+                  >
+                    {board.name}
+                  </Link>
+                ))}
+              </div>
             )}
-          >
-            <Icon className="size-4" />
-            {label}
-          </Link>
+          </div>
         ))}
       </nav>
     </aside>

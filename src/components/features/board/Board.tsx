@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { UserIcon } from 'lucide-react';
+import { EyeIcon, SettingsIcon } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { closestCorners, DndContext, DragOverlay } from '@dnd-kit/core';
 import {
@@ -9,15 +10,18 @@ import {
   SortableContext,
 } from '@dnd-kit/sortable';
 import { createPanel } from '@/app/(app)/dashboard/actions';
+import { BoardBreadcrumb } from '@/components/features/board/BoardBreadcrumb';
 import { PanelColumn } from '@/components/features/board/PanelColumn';
 import { TaskDialog } from '@/components/features/board/TaskDialog';
 import { TaskCard } from '@/components/features/board/TaskCard';
 import { AddTextForm } from '@/components/ui/AddTextForm';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonVariants } from '@/components/ui/Button';
 import { useBoardDrag } from '@/hooks/useBoardDrag';
 import type { BoardLabel, BoardPanel, BoardUser } from '@/types/board';
 
 interface BoardProps {
+  boardId: string;
+  boardName: string;
   panels: BoardPanel[];
   users: BoardUser[];
   labels: BoardLabel[];
@@ -27,6 +31,8 @@ interface BoardProps {
 }
 
 export function Board({
+  boardId,
+  boardName,
   panels: serverPanels,
   users,
   labels,
@@ -77,15 +83,23 @@ export function Board({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex px-4 pt-4">
+      <div className="flex items-center gap-4 px-4 pt-4">
+        <BoardBreadcrumb boardId={boardId} boardName={boardName} />
         <Button
           variant={isOnlyMine ? 'default' : 'outline'}
           size="sm"
           aria-pressed={isOnlyMine}
           onClick={() => setIsOnlyMine((current) => !current)}
         >
-          <UserIcon /> Minhas tarefas
+          <EyeIcon /> Minhas tarefas
         </Button>
+        <Link
+          href={`/dashboard/${boardId}/settings`}
+          aria-label="Configurações"
+          className={buttonVariants({ variant: 'outline', size: 'icon-sm' })}
+        >
+          <SettingsIcon />
+        </Link>
       </div>
       <div className="flex flex-1 items-start gap-3 overflow-x-auto p-4">
         <SortableContext
@@ -106,7 +120,7 @@ export function Board({
           <AddTextForm
             addLabel="Adicionar painel"
             placeholder="Nome do painel"
-            onSubmit={createPanel}
+            onSubmit={(name) => createPanel(boardId, name)}
           />
         </div>
       </div>
