@@ -7,6 +7,9 @@ import { requireSession } from '@/services/sessionService';
 import {
   addBoardMember as addBoardMemberRecord,
   archiveBoard as archiveBoardRecord,
+  assertBoardAccess,
+  assertPanelAccess,
+  assertTaskAccess,
   createBoard as createBoardRecord,
 } from '@/services/boardService';
 import {
@@ -55,43 +58,53 @@ export async function archiveBoard(boardId: string) {
 }
 
 export async function createPanel(boardId: string, name: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertBoardAccess(user.id, boardId);
   await createPanelRecord(boardId, cleanText(name));
   revalidatePath('/dashboard', 'layout');
 }
 
 export async function reorderPanels(panelIds: string[]) {
-  await requireSession();
+  const { user } = await requireSession();
+  await Promise.all(panelIds.map((id) => assertPanelAccess(user.id, id)));
   await reorderPanelRecords(panelIds);
   revalidatePath('/dashboard', 'layout');
 }
 
 export async function createTask(panelId: string, title: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertPanelAccess(user.id, panelId);
   await createTaskRecord(panelId, cleanText(title));
   revalidatePath('/dashboard', 'layout');
 }
 
 export async function moveTask(taskId: string, panelId: string, index: number) {
-  await requireSession();
+  const { user } = await requireSession();
+  await Promise.all([
+    assertTaskAccess(user.id, taskId),
+    assertPanelAccess(user.id, panelId),
+  ]);
   await moveTaskRecord(taskId, panelId, index);
   revalidatePath('/dashboard', 'layout');
 }
 
 export async function renamePanel(panelId: string, name: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertPanelAccess(user.id, panelId);
   await renamePanelRecord(panelId, cleanText(name));
   revalidatePath('/dashboard', 'layout');
 }
 
 export async function archivePanel(panelId: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertPanelAccess(user.id, panelId);
   await archivePanelRecord(panelId);
   revalidatePath('/dashboard', 'layout');
 }
 
 export async function updateTask(taskId: string, details: TaskDetails) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertTaskAccess(user.id, taskId);
   await updateTaskRecord(taskId, {
     title: cleanText(details.title),
     description: details.description?.trim() || null,
@@ -104,25 +117,29 @@ export async function updateTask(taskId: string, details: TaskDetails) {
 }
 
 export async function archiveTask(taskId: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertTaskAccess(user.id, taskId);
   await archiveTaskRecord(taskId);
   revalidatePath('/dashboard', 'layout');
 }
 
 export async function duplicateTask(taskId: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertTaskAccess(user.id, taskId);
   await duplicateTaskRecord(taskId);
   revalidatePath('/dashboard', 'layout');
 }
 
 export async function toggleTaskFollower(taskId: string) {
   const { user } = await requireSession();
+  await assertTaskAccess(user.id, taskId);
   await toggleTaskFollowerRecord(taskId, user.id);
   revalidatePath('/dashboard', 'layout');
 }
 
 export async function setTaskCompleted(taskId: string, isCompleted: boolean) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertTaskAccess(user.id, taskId);
   await setTaskCompletedRecord(taskId, isCompleted);
   revalidatePath('/dashboard', 'layout');
   revalidatePath('/home');

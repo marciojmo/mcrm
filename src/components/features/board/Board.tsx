@@ -63,7 +63,7 @@ export function Board({
     handleDragStart,
     handleDragOver,
     handleDragEnd,
-  } = useBoardDrag(panels, setPanels);
+  } = useBoardDrag(panels, setPanels, isOnlyMine);
 
   const visiblePanels = isOnlyMine
     ? panels.map((panel) => ({
@@ -77,7 +77,7 @@ export function Board({
   return (
     <DndContext
       id="board"
-      sensors={isOnlyMine ? [] : sensors}
+      sensors={sensors}
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
