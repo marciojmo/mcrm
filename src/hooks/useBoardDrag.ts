@@ -21,13 +21,16 @@ const DRAG_ACTIVATION_DISTANCE = 5;
 
 export function useBoardDrag(
   panels: BoardPanel[],
-  setPanels: Dispatch<SetStateAction<BoardPanel[]>>
+  setPanels: Dispatch<SetStateAction<BoardPanel[]>>,
+  isDisabled: boolean
 ) {
   const [activeTask, setActiveTask] = useState<BoardTask | null>(null);
   const [, startTransition] = useTransition();
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE },
+      activationConstraint: {
+        distance: isDisabled ? Infinity : DRAG_ACTIVATION_DISTANCE,
+      },
     })
   );
 

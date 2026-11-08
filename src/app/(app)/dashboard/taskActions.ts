@@ -25,6 +25,12 @@ import {
   updateLabel as updateLabelRecord,
 } from '@/services/labelService';
 import { toggleTaskMember as toggleTaskMemberRecord } from '@/services/memberService';
+import {
+  assertAttachmentAccess,
+  assertChecklistAccess,
+  assertChecklistItemAccess,
+  assertTaskAccess,
+} from '@/services/boardService';
 import { requireSession } from '@/services/sessionService';
 import { getTaskExtras as getTaskExtrasRecord } from '@/services/taskExtrasService';
 
@@ -56,7 +62,8 @@ async function refresh() {
 }
 
 export async function getTaskExtras(taskId: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertTaskAccess(user.id, taskId);
   return getTaskExtrasRecord(taskId);
 }
 
@@ -86,43 +93,53 @@ export async function deleteLabel(id: string) {
 }
 
 export async function toggleTaskLabel(taskId: string, labelId: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertTaskAccess(user.id, taskId);
   await toggleTaskLabelRecord(taskId, labelId);
   await refresh();
 }
 
 export async function toggleTaskMember(taskId: string, userId: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await Promise.all([
+    assertTaskAccess(user.id, taskId),
+    assertTaskAccess(userId, taskId),
+  ]);
   await toggleTaskMemberRecord(taskId, userId);
   await refresh();
 }
 
 export async function addChecklist(taskId: string, title: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertTaskAccess(user.id, taskId);
   await addChecklistRecord(taskId, cleanText(title));
   await refresh();
 }
 
 export async function deleteChecklist(checklistId: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertChecklistAccess(user.id, checklistId);
   await deleteChecklistRecord(checklistId);
   await refresh();
 }
 
 export async function addChecklistItem(checklistId: string, text: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertChecklistAccess(user.id, checklistId);
   await addChecklistItemRecord(checklistId, cleanText(text));
   await refresh();
 }
 
 export async function setChecklistItemDone(itemId: string, isDone: boolean) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertChecklistItemAccess(user.id, itemId);
   await setChecklistItemDoneRecord(itemId, isDone);
   await refresh();
 }
 
 export async function deleteChecklistItem(itemId: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertChecklistItemAccess(user.id, itemId);
   await deleteChecklistItemRecord(itemId);
   await refresh();
 }
@@ -133,6 +150,7 @@ export async function addComment(
   mentionedUserIds: string[]
 ) {
   const { user } = await requireSession();
+  await assertTaskAccess(user.id, taskId);
   await addCommentRecord(
     taskId,
     user.id,
@@ -168,7 +186,8 @@ export async function addLinkAttachment(
   url: string,
   name: string
 ) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertTaskAccess(user.id, taskId);
   const cleanUrlValue = cleanUrl(url);
   await addLinkAttachmentRecord(
     taskId,
@@ -179,7 +198,8 @@ export async function addLinkAttachment(
 }
 
 export async function deleteAttachment(attachmentId: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertAttachmentAccess(user.id, attachmentId);
   await deleteAttachmentRecord(attachmentId);
   await refresh();
 }
