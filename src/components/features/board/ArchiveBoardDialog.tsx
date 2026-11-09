@@ -33,7 +33,8 @@ export function ArchiveBoardDialog({
         <DialogHeader>
           <DialogTitle>Arquivar quadro &ldquo;{boardName}&rdquo;?</DialogTitle>
           <DialogDescription>
-            O quadro e suas tarefas deixarão de aparecer para todos os membros.
+            O quadro e suas tarefas deixarão de aparecer para todos os
+            participantes.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

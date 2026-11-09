@@ -106,6 +106,15 @@ export async function addBoardMember(
   });
 }
 
+export async function removeBoardMember(
+  boardId: string,
+  ownerId: string,
+  userId: string
+) {
+  await prisma.board.findFirstOrThrow({ where: { id: boardId, ownerId } });
+  await prisma.boardMember.deleteMany({ where: { boardId, userId } });
+}
+
 export async function archiveBoard(boardId: string, ownerId: string) {
   const { count } = await prisma.board.updateMany({
     where: { id: boardId, ownerId },
