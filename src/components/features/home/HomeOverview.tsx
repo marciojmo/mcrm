@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { ArrowLeftIcon, StarIcon, TrophyIcon, UsersIcon } from 'lucide-react';
+import { ArrowLeftIcon, StarIcon } from 'lucide-react';
 import { DeadlineList } from '@/components/features/home/DeadlineList';
 import { NotificationList } from '@/components/features/home/NotificationList';
 import { StatCard } from '@/components/features/home/StatCard';
 import { TaskCountsCard } from '@/components/features/home/TaskCountsCard';
+import { TopScorersCard } from '@/components/features/home/TopScorersCard';
 import { buttonVariants } from '@/components/ui/Button';
 import { formatLongDate } from '@/lib/formatLongDate';
 import type { HomeOverview as HomeOverviewData, HomeView } from '@/types/home';
@@ -65,7 +66,7 @@ export function HomeOverview({ overview, today, view }: HomeOverviewProps) {
     );
   }
 
-  const { stats, topScorer } = overview;
+  const { stats } = overview;
   return (
     <div className="flex flex-col gap-8 overflow-y-auto p-6">
       <header>
@@ -85,17 +86,7 @@ export function HomeOverview({ overview, today, view }: HomeOverviewProps) {
           hint="+10 concluída · +1 em aberto · −5 em atraso"
           isHighlighted
         />
-        <StatCard
-          icon={UsersIcon}
-          value={overview.teamAverageScore}
-          label="Média da equipe"
-        />
-        <StatCard
-          icon={TrophyIcon}
-          value={topScorer?.score ?? 0}
-          label="Melhor pontuação"
-          hint={topScorer?.name}
-        />
+        <TopScorersCard scorers={overview.topScorers} />
       </div>
       <Section title="Prazos mais apertados" seeAllHref="/home?view=deadlines">
         <DeadlineList deadlines={overview.deadlines} today={today} />

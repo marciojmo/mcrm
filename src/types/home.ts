@@ -34,8 +34,7 @@ export interface TopScorer {
 export interface HomeOverview {
   userName: string;
   stats: TaskStats;
-  teamAverageScore: number;
-  topScorer: TopScorer | null;
+  topScorers: TopScorer[];
   deadlines: HomeDeadline[];
   mentions: HomeMention[];
 }

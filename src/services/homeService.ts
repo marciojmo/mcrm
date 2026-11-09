@@ -4,6 +4,7 @@ import type { HomeOverview, HomeView } from '@/types/home';
 
 const MAX_DEADLINES = 3;
 const MAX_MENTIONS = 10;
+const MAX_TOP_SCORERS = 3;
 
 async function getTeamScores(today: string) {
   const users = await prisma.user.findMany({
@@ -79,24 +80,15 @@ export async function getHomeOverview(
     }),
   ]);
 
-  const scores = team.map((member) => member.stats.score);
-  const top = team.reduce<(typeof team)[number] | null>(
-    (best, member) =>
-      !best || member.stats.score > best.stats.score ? member : best,
-    null
-  );
-
   return {
     userName,
     stats:
       team.find((member) => member.id === userId)?.stats ??
       calculateTaskStats([], today),
-    teamAverageScore: scores.length
-      ? Math.round(
-          scores.reduce((sum, score) => sum + score, 0) / scores.length
-        )
-      : 0,
-    topScorer: top ? { name: top.name, score: top.stats.score } : null,
+    topScorers: team
+      .map((member) => ({ name: member.name, score: member.stats.score }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, MAX_TOP_SCORERS),
     deadlines: deadlines.map((task) => ({
       id: task.id,
       title: task.title,
