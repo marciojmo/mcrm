@@ -11,12 +11,14 @@ import {
 } from '@dnd-kit/sortable';
 import { createPanel } from '@/app/(app)/dashboard/actions';
 import { BoardBreadcrumb } from '@/components/features/board/BoardBreadcrumb';
+import { LabelFilter } from '@/components/features/board/LabelFilter';
 import { PanelColumn } from '@/components/features/board/PanelColumn';
 import { TaskDialog } from '@/components/features/board/TaskDialog';
 import { TaskCard } from '@/components/features/board/TaskCard';
 import { AddTextForm } from '@/components/ui/AddTextForm';
 import { Button, buttonVariants } from '@/components/ui/Button';
 import { useBoardDrag } from '@/hooks/useBoardDrag';
+import { filterBoardPanels } from '@/lib/filterBoardPanels';
 import type { BoardLabel, BoardPanel, BoardUser } from '@/types/board';
 import type { TaskReference } from '@/types/task';
 
@@ -50,6 +52,7 @@ export function Board({
   const router = useRouter();
   const { bfcacheId } = router;
   const [isOnlyMine, setIsOnlyMine] = useState(false);
+  const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
   const [openTaskId, setOpenTaskId] = useState(initialTaskId);
   const [syncedBfcacheId, setSyncedBfcacheId] = useState(bfcacheId);
   if (bfcacheId !== syncedBfcacheId) {
@@ -72,16 +75,17 @@ export function Board({
     handleDragStart,
     handleDragOver,
     handleDragEnd,
-  } = useBoardDrag(panels, setPanels, isOnlyMine);
+  } = useBoardDrag(panels, setPanels, isOnlyMine || filterLabelId !== null);
 
-  const visiblePanels = isOnlyMine
-    ? panels.map((panel) => ({
-        ...panel,
-        tasks: panel.tasks.filter((task) =>
-          task.memberIds.includes(currentUserId)
-        ),
-      }))
-    : panels;
+  const visiblePanels = filterBoardPanels(panels, {
+    memberId: isOnlyMine ? currentUserId : null,
+    labelId: filterLabelId,
+  });
+  const boardLabels = labels.filter((label) =>
+    panels.some((panel) =>
+      panel.tasks.some((task) => task.labelIds.includes(label.id))
+    )
+  );
 
   return (
     <DndContext
@@ -102,6 +106,13 @@ export function Board({
         >
           <EyeIcon /> Minhas tarefas
         </Button>
+        <LabelFilter
+          labels={boardLabels}
+          selectedLabel={
+            labels.find((label) => label.id === filterLabelId) ?? null
+          }
+          onSelect={setFilterLabelId}
+        />
         <Link
           href={`/dashboard/${boardId}/settings`}
           aria-label="Configurações"
