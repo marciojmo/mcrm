@@ -64,7 +64,7 @@ async function refresh() {
 export async function getTaskExtras(taskId: string) {
   const { user } = await requireSession();
   await assertTaskAccess(user.id, taskId);
-  return getTaskExtrasRecord(taskId);
+  return getTaskExtrasRecord(taskId, user.id);
 }
 
 export async function createLabel(name: string, color: string) {

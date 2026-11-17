@@ -5,42 +5,22 @@ import {
   deleteComment,
   updateComment,
 } from '@/app/(app)/dashboard/taskActions';
+import { CommentBody } from '@/components/features/board/task/CommentBody';
 import { MentionTextarea } from '@/components/features/board/task/MentionTextarea';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 import type { BoardUser } from '@/types/board';
-import type { TaskComment } from '@/types/task';
+import type { TaskComment, TaskReference } from '@/types/task';
 
 interface CommentItemProps {
   comment: TaskComment;
   users: BoardUser[];
   currentUserId: string;
   isHighlighted: boolean;
+  taskReferences: TaskReference[];
   onChange: () => Promise<void>;
-}
-
-function renderBody(comment: TaskComment, users: BoardUser[]) {
-  const names = comment.mentionedUserIds
-    .map((id) => users.find((user) => user.id === id)?.name)
-    .filter((name): name is string => Boolean(name))
-    .map((name) => `@${name}`);
-  if (names.length === 0) return comment.body;
-  const pattern = new RegExp(
-    `(${names.map((name) => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`
-  );
-  return comment.body.split(pattern).map((part, index) =>
-    names.includes(part) ? (
-      <span
-        key={index}
-        className="rounded bg-primary/10 px-1 font-medium text-primary"
-      >
-        {part}
-      </span>
-    ) : (
-      part
-    )
-  );
+  onOpenTask: (reference: TaskReference) => void;
 }
 
 export function CommentItem({
@@ -48,7 +28,9 @@ export function CommentItem({
   users,
   currentUserId,
   isHighlighted,
+  taskReferences,
   onChange,
+  onOpenTask,
 }: CommentItemProps) {
   const itemRef = useRef<HTMLLIElement>(null);
   useEffect(() => {
@@ -123,9 +105,12 @@ export function CommentItem({
             </div>
           </>
         ) : (
-          <p className="whitespace-pre-wrap break-words">
-            {renderBody(comment, users)}
-          </p>
+          <CommentBody
+            comment={comment}
+            users={users}
+            taskReferences={taskReferences}
+            onOpenTask={onOpenTask}
+          />
         )}
         {isOwn && !isEditing && (
           <div className="flex gap-2 text-xs">

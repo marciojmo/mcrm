@@ -1,9 +1,26 @@
+import type { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import type { TaskDetails } from '@/types/board';
 
+async function claimTaskNumber(tx: Prisma.TransactionClient, panelId: string) {
+  const { boardId } = await tx.panel.findUniqueOrThrow({
+    where: { id: panelId },
+    select: { boardId: true },
+  });
+  const board = await tx.board.update({
+    where: { id: boardId },
+    data: { lastTaskNumber: { increment: 1 } },
+    select: { lastTaskNumber: true },
+  });
+  return board.lastTaskNumber;
+}
+
 export async function createTask(panelId: string, title: string) {
-  const position = await prisma.task.count({ where: { panelId } });
-  return prisma.task.create({ data: { panelId, title, position } });
+  return prisma.$transaction(async (tx) => {
+    const position = await tx.task.count({ where: { panelId } });
+    const number = await claimTaskNumber(tx, panelId);
+    return tx.task.create({ data: { panelId, title, position, number } });
+  });
 }
 
 export async function updateTask(taskId: string, details: TaskDetails) {
@@ -86,35 +103,39 @@ export async function duplicateTask(taskId: string) {
       checklists: { include: { items: true } },
     },
   });
-  const position = await prisma.task.count({
-    where: { panelId: source.panelId, archivedAt: null },
-  });
-  return prisma.task.create({
-    data: {
-      panelId: source.panelId,
-      title: source.title,
-      description: source.description,
-      dueDate: source.dueDate,
-      position,
-      labels: {
-        create: source.labels.map(({ labelId }) => ({ labelId })),
+  return prisma.$transaction(async (tx) => {
+    const position = await tx.task.count({
+      where: { panelId: source.panelId, archivedAt: null },
+    });
+    const number = await claimTaskNumber(tx, source.panelId);
+    return tx.task.create({
+      data: {
+        panelId: source.panelId,
+        number,
+        title: source.title,
+        description: source.description,
+        dueDate: source.dueDate,
+        position,
+        labels: {
+          create: source.labels.map(({ labelId }) => ({ labelId })),
+        },
+        members: {
+          create: source.members.map(({ userId }) => ({ userId })),
+        },
+        checklists: {
+          create: source.checklists.map((checklist) => ({
+            title: checklist.title,
+            position: checklist.position,
+            items: {
+              create: checklist.items.map(({ text, isDone, position }) => ({
+                text,
+                isDone,
+                position,
+              })),
+            },
+          })),
+        },
       },
-      members: {
-        create: source.members.map(({ userId }) => ({ userId })),
-      },
-      checklists: {
-        create: source.checklists.map((checklist) => ({
-          title: checklist.title,
-          position: checklist.position,
-          items: {
-            create: checklist.items.map(({ text, isDone, position }) => ({
-              text,
-              isDone,
-              position,
-            })),
-          },
-        })),
-      },
-    },
+    });
   });
 }
