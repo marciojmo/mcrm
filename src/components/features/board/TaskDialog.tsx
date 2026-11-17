@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { EyeIcon } from 'lucide-react';
 import { updateTask } from '@/app/(app)/dashboard/actions';
+import { toggleTaskLabel } from '@/app/(app)/dashboard/taskActions';
 import { LabelChip } from '@/components/features/board/LabelChip';
 import { AddAttachmentPopover } from '@/components/features/board/task/AddAttachmentPopover';
 import { AddChecklistPopover } from '@/components/features/board/task/AddChecklistPopover';
@@ -128,7 +129,15 @@ export function TaskDialog({
               {taskLabels.length > 0 && (
                 <div className="flex flex-wrap gap-1" aria-label="Etiquetas">
                   {taskLabels.map((label) => (
-                    <LabelChip key={label.id} label={label} />
+                    <LabelChip
+                      key={label.id}
+                      label={label}
+                      onRemove={() =>
+                        startTransition(() =>
+                          toggleTaskLabel(task.id, label.id)
+                        )
+                      }
+                    />
                   ))}
                 </div>
               )}
