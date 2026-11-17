@@ -78,6 +78,7 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            <span className="font-mono text-[11px]">{task.identifier}</span>
             {task.dueDate && (
               <span className="flex items-center gap-1">
                 <CalendarIcon className="size-3" />

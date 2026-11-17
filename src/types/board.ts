@@ -12,6 +12,7 @@ export interface BoardLabel {
 
 export interface BoardTask {
   id: string;
+  identifier: string;
   title: string;
   description: string | null;
   dueDate: string | null;

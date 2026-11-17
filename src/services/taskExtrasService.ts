@@ -1,7 +1,11 @@
 import { prisma } from '@/lib/prisma';
+import { findTaskReferences } from '@/services/boardService';
 import type { TaskExtras } from '@/types/task';
 
-export async function getTaskExtras(taskId: string): Promise<TaskExtras> {
+export async function getTaskExtras(
+  taskId: string,
+  userId: string
+): Promise<TaskExtras> {
   const task = await prisma.task.findUniqueOrThrow({
     where: { id: taskId },
     select: {
@@ -49,5 +53,9 @@ export async function getTaskExtras(taskId: string): Promise<TaskExtras> {
       ...attachment,
       createdAt: attachment.createdAt.toISOString(),
     })),
+    taskReferences: await findTaskReferences(
+      userId,
+      task.comments.map((comment) => comment.body)
+    ),
   };
 }
