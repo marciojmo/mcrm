@@ -12,7 +12,6 @@ export const config = {
   matcher: [
     '/home/:path*',
     '/dashboard/:path*',
-    '/wiki/:path*',
     '/settings/:path*',
     '/admin/:path*',
   ],
