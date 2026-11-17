@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  BookOpenIcon,
   BriefcaseIcon,
   HomeIcon,
   SettingsIcon,
@@ -15,7 +14,6 @@ import type { BoardSummary } from '@/types/board';
 const NAV_ITEMS = [
   { href: '/home', label: 'Início', Icon: HomeIcon },
   { href: '/dashboard', label: 'Trabalho', Icon: BriefcaseIcon },
-  { href: '/wiki', label: 'Wiki', Icon: BookOpenIcon },
   { href: '/settings', label: 'Configurações', Icon: SettingsIcon },
 ];
 

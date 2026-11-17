@@ -6,7 +6,7 @@ import { CommentItem } from '@/components/features/board/task/CommentItem';
 import { MentionTextarea } from '@/components/features/board/task/MentionTextarea';
 import { Button } from '@/components/ui/Button';
 import type { BoardUser } from '@/types/board';
-import type { TaskComment } from '@/types/task';
+import type { TaskComment, TaskReference } from '@/types/task';
 
 interface CommentsSectionProps {
   taskId: string;
@@ -14,7 +14,9 @@ interface CommentsSectionProps {
   currentUserId: string;
   highlightCommentId: string | null;
   comments: TaskComment[];
+  taskReferences: TaskReference[];
   onChange: () => Promise<void>;
+  onOpenTask: (reference: TaskReference) => void;
 }
 
 export function CommentsSection({
@@ -23,7 +25,9 @@ export function CommentsSection({
   currentUserId,
   highlightCommentId,
   comments,
+  taskReferences,
   onChange,
+  onOpenTask,
 }: CommentsSectionProps) {
   const [body, setBody] = useState('');
   const [mentionedIds, setMentionedIds] = useState<string[]>([]);
@@ -67,7 +71,9 @@ export function CommentsSection({
             users={users}
             currentUserId={currentUserId}
             isHighlighted={comment.id === highlightCommentId}
+            taskReferences={taskReferences}
             onChange={onChange}
+            onOpenTask={onOpenTask}
           />
         ))}
       </ul>

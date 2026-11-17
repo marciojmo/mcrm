@@ -1,7 +1,12 @@
 import { prisma } from '@/lib/prisma';
+import { formatTaskIdentifier } from '@/lib/taskIdentifier';
 import type { BoardPanel } from '@/types/board';
 
 export async function listPanels(boardId: string): Promise<BoardPanel[]> {
+  const board = await prisma.board.findUniqueOrThrow({
+    where: { id: boardId },
+    select: { key: true },
+  });
   const panels = await prisma.panel.findMany({
     where: { boardId, archivedAt: null },
     orderBy: { position: 'asc' },
@@ -13,6 +18,7 @@ export async function listPanels(boardId: string): Promise<BoardPanel[]> {
         orderBy: { position: 'asc' },
         select: {
           id: true,
+          number: true,
           title: true,
           description: true,
           dueDate: true,
@@ -33,6 +39,7 @@ export async function listPanels(boardId: string): Promise<BoardPanel[]> {
       const items = task.checklists.flatMap((checklist) => checklist.items);
       return {
         id: task.id,
+        identifier: formatTaskIdentifier(board.key, task.number),
         title: task.title,
         description: task.description,
         dueDate: task.dueDate?.toISOString().slice(0, 10) ?? null,

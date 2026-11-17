@@ -20,6 +20,7 @@ import { Button, buttonVariants } from '@/components/ui/Button';
 import { useBoardDrag } from '@/hooks/useBoardDrag';
 import { filterBoardPanels } from '@/lib/filterBoardPanels';
 import type { BoardLabel, BoardPanel, BoardUser } from '@/types/board';
+import type { TaskReference } from '@/types/task';
 
 interface BoardProps {
   boardId: string;
@@ -48,7 +49,8 @@ export function Board({
     setSyncedPanels(serverPanels);
     setPanels(serverPanels);
   }
-  const { bfcacheId } = useRouter();
+  const router = useRouter();
+  const { bfcacheId } = router;
   const [isOnlyMine, setIsOnlyMine] = useState(false);
   const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
   const [openTaskId, setOpenTaskId] = useState(initialTaskId);
@@ -60,6 +62,13 @@ export function Board({
   const openTask = panels
     .flatMap((panel) => panel.tasks)
     .find((task) => task.id === openTaskId);
+  function openTaskReference(reference: TaskReference) {
+    if (reference.boardId === boardId) {
+      setOpenTaskId(reference.taskId);
+      return;
+    }
+    router.push(`/dashboard/${reference.boardId}?task=${reference.taskId}`);
+  }
   const {
     sensors,
     activeTask,
@@ -149,6 +158,7 @@ export function Board({
           currentUserId={currentUserId}
           highlightCommentId={highlightCommentId}
           onClose={() => setOpenTaskId(null)}
+          onOpenTask={openTaskReference}
         />
       )}
     </DndContext>

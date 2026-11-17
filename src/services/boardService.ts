@@ -1,6 +1,12 @@
 import type { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
+import {
+  formatTaskIdentifier,
+  listBoardKeyCandidates,
+  parseTaskIdentifiers,
+} from '@/lib/taskIdentifier';
 import type { BoardDetails, BoardSummary, BoardUser } from '@/types/board';
+import type { TaskReference } from '@/types/task';
 
 function visibleTo(userId: string) {
   return {
@@ -89,8 +95,21 @@ export async function listBoardMembers(boardId: string): Promise<BoardUser[]> {
   return [board.owner, ...board.members.map((member) => member.user)];
 }
 
+async function findFreeBoardKey(name: string) {
+  const candidates = listBoardKeyCandidates(name);
+  const taken = await prisma.board.findMany({
+    where: { key: { in: candidates } },
+    select: { key: true },
+  });
+  const takenKeys = new Set(taken.map((board) => board.key));
+  const key = candidates.find((candidate) => !takenKeys.has(candidate));
+  if (!key) throw new Error('No board key available');
+  return key;
+}
+
 export async function createBoard(name: string, ownerId: string) {
-  return prisma.board.create({ data: { name, ownerId } });
+  const key = await findFreeBoardKey(name);
+  return prisma.board.create({ data: { name, key, ownerId } });
 }
 
 export async function addBoardMember(
@@ -129,4 +148,31 @@ export async function getTaskBoardId(taskId: string) {
     select: { panel: { select: { boardId: true } } },
   });
   return task?.panel.boardId ?? null;
+}
+
+export async function findTaskReferences(
+  userId: string,
+  texts: string[]
+): Promise<TaskReference[]> {
+  const identifiers = texts.flatMap(parseTaskIdentifiers);
+  if (identifiers.length === 0) return [];
+  const tasks = await prisma.task.findMany({
+    where: {
+      archivedAt: null,
+      OR: identifiers.map(({ key, number }) => ({
+        number,
+        panel: { board: { key, ...visibleTo(userId) } },
+      })),
+    },
+    select: {
+      id: true,
+      number: true,
+      panel: { select: { board: { select: { id: true, key: true } } } },
+    },
+  });
+  return tasks.map((task) => ({
+    identifier: formatTaskIdentifier(task.panel.board.key, task.number),
+    taskId: task.id,
+    boardId: task.panel.board.id,
+  }));
 }
