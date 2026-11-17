@@ -38,7 +38,7 @@ src/
 └── config/
 ```
 
-Cada pasta tem uma responsabilidade. Nada de Prisma fora de `services/`.
+Cada pasta tem uma responsabilidade. Nada de Prisma fora de `services/`, exceto o singleton em `lib/prisma.ts`.
 
 ## Nomenclatura
 
