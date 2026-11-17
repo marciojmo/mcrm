@@ -29,8 +29,15 @@ export interface TaskAttachment {
   createdAt: string;
 }
 
+export interface TaskReference {
+  identifier: string;
+  taskId: string;
+  boardId: string;
+}
+
 export interface TaskExtras {
   checklists: Checklist[];
   comments: TaskComment[];
   attachments: TaskAttachment[];
+  taskReferences: TaskReference[];
 }
