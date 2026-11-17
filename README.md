@@ -44,8 +44,9 @@ Fill in `.env`:
 | `GOOGLE_CLIENT_ID`        | Google OAuth client ID                                                      | —                                                    |
 | `GOOGLE_CLIENT_SECRET`    | Google OAuth client secret                                                  | —                                                    |
 | `GOOGLE_WORKSPACE_DOMAIN` | Only accounts from this Google Workspace domain can sign in (without the @) | `example.com`                                        |
+| `ADMIN_EMAILS`            | Comma-separated e-mails that can open the God mode at `/admin` (optional)   | `ana@example.com,bob@example.com`                    |
 
-All variables are required. The app fails on startup if one is missing.
+All variables except `ADMIN_EMAILS` are required. The app fails on startup if one is missing.
 
 ### 4. Apply the database migrations
 
