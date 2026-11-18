@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { renameBoard } from '@/app/(app)/dashboard/actions';
 import { Input } from '@/components/ui/Input';
 
@@ -13,6 +13,14 @@ export function BoardNameEditor({ boardId, boardName }: BoardNameEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(boardName);
   const [isPending, startTransition] = useTransition();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const hasEdited = useRef(false);
+
+  useEffect(() => {
+    if (isEditing) hasEdited.current = true;
+    else if (hasEdited.current && document.activeElement === document.body)
+      buttonRef.current?.focus();
+  }, [isEditing]);
 
   function startEditing() {
     setName(boardName);
@@ -50,6 +58,7 @@ export function BoardNameEditor({ boardId, boardName }: BoardNameEditorProps) {
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       className="cursor-text truncate rounded-md px-1 font-medium text-foreground hover:bg-muted"
       onClick={startEditing}
