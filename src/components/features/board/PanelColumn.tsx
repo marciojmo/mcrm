@@ -48,7 +48,11 @@ export function PanelColumn({
       <PanelHeader
         panel={panel}
         dragHandleRef={setActivatorNodeRef}
-        dragProps={{ ...attributes, ...listeners }}
+        dragProps={{
+          ...attributes,
+          ...listeners,
+          'aria-label': `Mover painel ${panel.name}`,
+        }}
       />
       <div className="flex min-h-2 flex-col gap-2 overflow-y-auto">
         <SortableContext

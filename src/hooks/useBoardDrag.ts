@@ -62,7 +62,7 @@ export function useBoardDrag(
     const overId = String(over.id);
 
     if (active.data.current?.type === 'panel') {
-      if (activeId === overId) return;
+      if (activeId === overId || over.data.current?.type !== 'panel') return;
       const from = panels.findIndex((panel) => panel.id === activeId);
       const to = panels.findIndex((panel) => panel.id === overId);
       const reordered = arrayMove(panels, from, to);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition, type HTMLAttributes } from 'react';
+import { useRef, useState, useTransition, type HTMLAttributes } from 'react';
 import { MoreHorizontalIcon } from 'lucide-react';
 import { renamePanel } from '@/app/(app)/dashboard/actions';
 import { ArchivePanelDialog } from '@/components/features/board/ArchivePanelDialog';
@@ -28,6 +28,7 @@ export function PanelHeader({
   const [isArchiving, setIsArchiving] = useState(false);
   const [name, setName] = useState(panel.name);
   const [isPending, startTransition] = useTransition();
+  const shouldRefocusNameRef = useRef(false);
 
   function startEditing() {
     setName(panel.name);
@@ -48,7 +49,7 @@ export function PanelHeader({
     <>
       <div
         ref={dragHandleRef}
-        className="flex cursor-grab touch-none items-center justify-between gap-1 px-2 pt-1"
+        className="flex cursor-grab touch-none items-center justify-between gap-1 rounded-md px-2 pt-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         {...(isEditing ? {} : dragProps)}
       >
         {isEditing ? (
@@ -61,6 +62,9 @@ export function PanelHeader({
             onFocus={(event) => event.target.select()}
             onBlur={save}
             onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === 'Escape') {
+                shouldRefocusNameRef.current = true;
+              }
               if (event.key === 'Enter') save();
               if (event.key === 'Escape') setIsEditing(false);
             }}
@@ -68,6 +72,11 @@ export function PanelHeader({
         ) : (
           <h2 className="min-w-0 flex-1 truncate text-sm font-semibold">
             <button
+              ref={(button) => {
+                if (!button || !shouldRefocusNameRef.current) return;
+                shouldRefocusNameRef.current = false;
+                button.focus();
+              }}
               type="button"
               aria-label={`Renomear painel ${panel.name}`}
               className="max-w-full cursor-text truncate rounded-md text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
