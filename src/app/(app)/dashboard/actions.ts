@@ -31,12 +31,28 @@ import {
 } from '@/services/taskService';
 
 const MAX_TEXT_LENGTH = 200;
+const MAX_DESCRIPTION_LENGTH = 10_000;
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 function cleanText(value: string) {
-  const text = value.trim();
+  const text = typeof value === 'string' ? value.trim() : '';
   if (!text || text.length > MAX_TEXT_LENGTH) throw new Error('Invalid text');
   return text;
+}
+
+function cleanDescription(value: string | null) {
+  if (!value) return null;
+  if (typeof value !== 'string' || value.length > MAX_DESCRIPTION_LENGTH)
+    throw new Error('Invalid description');
+  return value.trim() || null;
+}
+
+function cleanDueDate(value: string | null) {
+  if (!value) return null;
+  const date = new Date(ISO_DATE.test(value) ? value : NaN);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value)
+    throw new Error('Invalid due date');
+  return value;
 }
 
 export async function createBoard(name: string) {
@@ -94,6 +110,7 @@ export async function createTask(panelId: string, title: string) {
 }
 
 export async function moveTask(taskId: string, panelId: string, index: number) {
+  if (!Number.isInteger(index) || index < 0) throw new Error('Invalid index');
   const { user } = await requireSession();
   await Promise.all([
     assertTaskAccess(user.id, taskId),
@@ -122,11 +139,8 @@ export async function updateTask(taskId: string, details: TaskDetails) {
   await assertTaskAccess(user.id, taskId);
   await updateTaskRecord(taskId, {
     title: cleanText(details.title),
-    description: details.description?.trim() || null,
-    dueDate:
-      details.dueDate && ISO_DATE.test(details.dueDate)
-        ? details.dueDate
-        : null,
+    description: cleanDescription(details.description),
+    dueDate: cleanDueDate(details.dueDate),
   });
   revalidatePath('/dashboard', 'layout');
 }
@@ -153,6 +167,7 @@ export async function toggleTaskFollower(taskId: string) {
 }
 
 export async function setTaskCompleted(taskId: string, isCompleted: boolean) {
+  if (typeof isCompleted !== 'boolean') throw new Error('Invalid status');
   const { user } = await requireSession();
   await assertTaskAccess(user.id, taskId);
   await setTaskCompletedRecord(taskId, isCompleted);
