@@ -81,6 +81,7 @@ export function Board({
     handleDragStart,
     handleDragOver,
     handleDragEnd,
+    handleDragCancel,
   } = useBoardDrag(panels, setPanels, isDragPaused);
 
   const visiblePanels = filterBoardPanels(panels, {
@@ -101,6 +102,7 @@ export function Board({
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
       accessibility={{
         announcements: DRAG_ANNOUNCEMENTS,
         screenReaderInstructions: isDragPaused
@@ -134,11 +136,9 @@ export function Board({
           }
           onSelect={setFilterLabelId}
         />
-        {isDragPaused && (
-          <p role="status" className="text-xs text-muted-foreground">
-            Reordenar está pausado enquanto há filtro ativo
-          </p>
-        )}
+        <p role="status" className="text-xs text-muted-foreground">
+          {isDragPaused && 'Reordenar está pausado enquanto há filtro ativo'}
+        </p>
       </div>
       <div className="flex flex-1 items-start gap-3 overflow-x-auto p-4">
         <SortableContext

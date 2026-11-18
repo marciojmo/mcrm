@@ -23,6 +23,7 @@ export function useBoardDrag(
 ) {
   const [activeTask, setActiveTask] = useState<BoardTask | null>(null);
   const savedPanels = useRef(panels);
+  const dragStartPanels = useRef(panels);
   const pendingMoveCount = useRef(0);
   const { runAction } = useSafeTransition();
   const keyboardSensor = useSensor(KeyboardSensor, {
@@ -39,6 +40,7 @@ export function useBoardDrag(
 
   function handleDragStart({ active }: DragStartEvent) {
     if (pendingMoveCount.current === 0) savedPanels.current = panels;
+    dragStartPanels.current = panels;
     if (active.data.current?.type !== 'task') return;
     const panel = findPanelByTaskId(panels, String(active.id));
     setActiveTask(panel?.tasks.find((task) => task.id === active.id) ?? null);
@@ -82,6 +84,11 @@ export function useBoardDrag(
     saveMove(() => moveTask(activeId, panel.id, to));
   }
 
+  function handleDragCancel() {
+    setActiveTask(null);
+    setPanels(dragStartPanels.current);
+  }
+
   async function saveMove(action: () => Promise<unknown>) {
     pendingMoveCount.current += 1;
     await runAction(action, {
@@ -96,5 +103,6 @@ export function useBoardDrag(
     handleDragStart,
     handleDragOver,
     handleDragEnd,
+    handleDragCancel,
   };
 }
