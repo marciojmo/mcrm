@@ -4,7 +4,7 @@ import type { TaskDetails } from '@/types/board';
 
 async function claimTaskNumber(tx: Prisma.TransactionClient, panelId: string) {
   const { boardId } = await tx.panel.findUniqueOrThrow({
-    where: { id: panelId },
+    where: { id: panelId, archivedAt: null },
     select: { boardId: true },
   });
   const board = await tx.board.update({
@@ -25,7 +25,7 @@ export async function createTask(panelId: string, title: string) {
 
 export async function updateTask(taskId: string, details: TaskDetails) {
   return prisma.task.update({
-    where: { id: taskId },
+    where: { id: taskId, archivedAt: null },
     data: {
       ...details,
       dueDate: details.dueDate ? new Date(details.dueDate) : null,
@@ -35,7 +35,7 @@ export async function updateTask(taskId: string, details: TaskDetails) {
 
 export async function archiveTask(taskId: string) {
   return prisma.task.update({
-    where: { id: taskId },
+    where: { id: taskId, archivedAt: null },
     data: { archivedAt: new Date() },
   });
 }
@@ -46,7 +46,13 @@ export async function moveTask(
   targetIndex: number
 ) {
   await prisma.$transaction(async (tx) => {
-    const task = await tx.task.findUniqueOrThrow({ where: { id: taskId } });
+    const task = await tx.task.findUniqueOrThrow({
+      where: { id: taskId, archivedAt: null },
+    });
+    await tx.panel.findUniqueOrThrow({
+      where: { id: targetPanelId, archivedAt: null },
+      select: { id: true },
+    });
     const targetIds = (
       await tx.task.findMany({
         where: { panelId: targetPanelId, id: { not: taskId } },
@@ -82,7 +88,7 @@ export async function moveTask(
 
 export async function setTaskCompleted(taskId: string, isCompleted: boolean) {
   return prisma.task.update({
-    where: { id: taskId },
+    where: { id: taskId, archivedAt: null },
     data: { completedAt: isCompleted ? new Date() : null },
   });
 }
@@ -96,7 +102,7 @@ export async function toggleTaskFollower(taskId: string, userId: string) {
 
 export async function duplicateTask(taskId: string) {
   const source = await prisma.task.findUniqueOrThrow({
-    where: { id: taskId },
+    where: { id: taskId, archivedAt: null },
     include: {
       labels: true,
       members: true,
