@@ -1,4 +1,4 @@
-import type { Prisma } from '@/generated/prisma/client';
+import { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import {
   formatTaskIdentifier,
@@ -95,21 +95,32 @@ export async function listBoardMembers(boardId: string): Promise<BoardUser[]> {
   return [board.owner, ...board.members.map((member) => member.user)];
 }
 
-async function findFreeBoardKey(name: string) {
+async function listFreeBoardKeys(name: string) {
   const candidates = listBoardKeyCandidates(name);
   const taken = await prisma.board.findMany({
     where: { key: { in: candidates } },
     select: { key: true },
   });
   const takenKeys = new Set(taken.map((board) => board.key));
-  const key = candidates.find((candidate) => !takenKeys.has(candidate));
-  if (!key) throw new Error('No board key available');
-  return key;
+  return candidates.filter((candidate) => !takenKeys.has(candidate));
+}
+
+function isUniqueViolation(error: unknown) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === 'P2002'
+  );
 }
 
 export async function createBoard(name: string, ownerId: string) {
-  const key = await findFreeBoardKey(name);
-  return prisma.board.create({ data: { name, key, ownerId } });
+  for (const key of await listFreeBoardKeys(name)) {
+    try {
+      return await prisma.board.create({ data: { name, key, ownerId } });
+    } catch (error) {
+      if (!isUniqueViolation(error)) throw error;
+    }
+  }
+  throw new Error('No board key available');
 }
 
 export async function renameBoard(boardId: string, name: string) {
