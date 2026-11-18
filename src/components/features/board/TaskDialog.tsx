@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { EyeIcon } from 'lucide-react';
 import { updateTask } from '@/app/(app)/dashboard/actions';
 import { toggleTaskLabel } from '@/app/(app)/dashboard/taskActions';
@@ -28,6 +28,14 @@ import type {
 } from '@/types/board';
 import type { TaskReference } from '@/types/task';
 
+function normalizeDetails({ title, description, dueDate }: TaskDetails) {
+  return {
+    title: title.trim(),
+    description: description?.trim() || null,
+    dueDate,
+  };
+}
+
 interface TaskDialogProps {
   task: BoardTask;
   users: BoardUser[];
@@ -47,11 +55,8 @@ export function TaskDialog({
   onClose,
   onOpenTask,
 }: TaskDialogProps) {
-  const [details, setDetails] = useState<TaskDetails>({
-    title: task.title,
-    description: task.description,
-    dueDate: task.dueDate,
-  });
+  const [details, setDetails] = useState(() => normalizeDetails(task));
+  const savedDetails = useRef(details);
   const [, startTransition] = useTransition();
   const { extras, reload } = useTaskExtras(task.id);
   const completion = useTaskCompletion(task.id, task.isCompleted);
@@ -60,21 +65,16 @@ export function TaskDialog({
   const members = users.filter((user) => task.memberIds.includes(user.id));
 
   function save(changes: Partial<TaskDetails>) {
-    const next = { ...details, ...changes };
-    if (!next.title.trim()) {
-      setDetails({ ...next, title: task.title });
-      return;
-    }
+    const merged = { ...details, ...changes };
+    const next = merged.title.trim()
+      ? merged
+      : { ...merged, title: savedDetails.current.title };
     setDetails(next);
-    if (hasChanged(next)) startTransition(() => updateTask(task.id, next));
-  }
-
-  function hasChanged(next: TaskDetails) {
-    return (
-      next.title !== task.title ||
-      (next.description ?? '') !== (task.description ?? '') ||
-      next.dueDate !== task.dueDate
-    );
+    const normalized = normalizeDetails(next);
+    if (JSON.stringify(normalized) === JSON.stringify(savedDetails.current))
+      return;
+    savedDetails.current = normalized;
+    startTransition(() => updateTask(task.id, next));
   }
 
   function close() {
