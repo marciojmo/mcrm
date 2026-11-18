@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useTransition } from 'react';
+import { useRef, useState } from 'react';
 import { EyeIcon } from 'lucide-react';
 import { updateTask } from '@/app/(app)/dashboard/actions';
 import { toggleTaskLabel } from '@/app/(app)/dashboard/taskActions';
@@ -20,6 +20,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { MAX_DESCRIPTION_LENGTH } from '@/constants/task';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 import { useTaskCompletion } from '@/hooks/useTaskCompletion';
 import { useTaskExtras } from '@/hooks/useTaskExtras';
 import type {
@@ -59,29 +60,33 @@ export function TaskDialog({
 }: TaskDialogProps) {
   const [details, setDetails] = useState(() => normalizeDetails(task));
   const savedDetails = useRef(details);
-  const [, startTransition] = useTransition();
+  const runAction = useSafeTransition();
   const { extras, reload } = useTaskExtras(task.id);
   const completion = useTaskCompletion(task.id, task.isCompleted);
   const taskLabels = labels.filter((label) => task.labelIds.includes(label.id));
   const isFollowing = task.followerIds.includes(currentUserId);
   const members = users.filter((user) => task.memberIds.includes(user.id));
 
-  function save(changes: Partial<TaskDetails>) {
+  function save(changes: Partial<TaskDetails>, onSaved?: () => void) {
     const merged = { ...details, ...changes };
     const next = merged.title.trim()
       ? merged
       : { ...merged, title: savedDetails.current.title };
     setDetails(next);
     const normalized = normalizeDetails(next);
-    if (JSON.stringify(normalized) === JSON.stringify(savedDetails.current))
+    if (JSON.stringify(normalized) === JSON.stringify(savedDetails.current)) {
+      onSaved?.();
       return;
-    savedDetails.current = normalized;
-    startTransition(() => updateTask(task.id, next));
+    }
+    runAction(async () => {
+      await updateTask(task.id, next);
+      savedDetails.current = normalized;
+      onSaved?.();
+    });
   }
 
   function close() {
-    save({});
-    onClose();
+    save({}, onClose);
   }
 
   return (
@@ -141,9 +146,7 @@ export function TaskDialog({
                       key={label.id}
                       label={label}
                       onRemove={() =>
-                        startTransition(() =>
-                          toggleTaskLabel(task.id, label.id)
-                        )
+                        runAction(() => toggleTaskLabel(task.id, label.id))
                       }
                     />
                   ))}

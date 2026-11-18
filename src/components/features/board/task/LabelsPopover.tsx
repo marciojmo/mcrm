@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { PencilIcon, TagIcon } from 'lucide-react';
 import { toggleTaskLabel } from '@/app/(app)/dashboard/taskActions';
 import { LabelChip } from '@/components/features/board/LabelChip';
@@ -12,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/Popover';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 import type { BoardLabel, BoardTask } from '@/types/board';
 
 interface LabelsPopoverProps {
@@ -22,7 +23,7 @@ interface LabelsPopoverProps {
 export function LabelsPopover({ task, labels }: LabelsPopoverProps) {
   const [query, setQuery] = useState('');
   const [editing, setEditing] = useState<BoardLabel | 'new' | null>(null);
-  const [, startTransition] = useTransition();
+  const runAction = useSafeTransition();
   const matches = labels.filter((label) =>
     label.name.toLowerCase().includes(query.trim().toLowerCase())
   );
@@ -55,7 +56,7 @@ export function LabelsPopover({ task, labels }: LabelsPopoverProps) {
                     aria-label={label.name || label.color}
                     checked={task.labelIds.includes(label.id)}
                     onChange={() =>
-                      startTransition(() => toggleTaskLabel(task.id, label.id))
+                      runAction(() => toggleTaskLabel(task.id, label.id))
                     }
                   />
                   <span className="min-w-0 flex-1">

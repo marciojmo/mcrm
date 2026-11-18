@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { CheckIcon, UserPlusIcon } from 'lucide-react';
 import { toggleTaskMember } from '@/app/(app)/dashboard/taskActions';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/Popover';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 import type { BoardTask, BoardUser } from '@/types/board';
 
 interface MembersPopoverProps {
@@ -20,7 +21,7 @@ interface MembersPopoverProps {
 
 export function MembersPopover({ task, users }: MembersPopoverProps) {
   const [query, setQuery] = useState('');
-  const [, startTransition] = useTransition();
+  const runAction = useSafeTransition();
   const matches = users.filter((user) =>
     user.name.toLowerCase().includes(query.trim().toLowerCase())
   );
@@ -51,7 +52,7 @@ export function MembersPopover({ task, users }: MembersPopoverProps) {
                   type="button"
                   className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted"
                   onClick={() =>
-                    startTransition(() => toggleTaskMember(task.id, user.id))
+                    runAction(() => toggleTaskMember(task.id, user.id))
                   }
                 >
                   <UserAvatar user={user} />

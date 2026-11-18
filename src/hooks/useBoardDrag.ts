@@ -1,9 +1,4 @@
-import {
-  useState,
-  useTransition,
-  type Dispatch,
-  type SetStateAction,
-} from 'react';
+import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import {
   KeyboardSensor,
   PointerSensor,
@@ -15,6 +10,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { moveTask, reorderPanels } from '@/app/(app)/dashboard/actions';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 import { findPanelByTaskId, moveTaskToPanel } from '@/lib/boardMoves';
 import type { BoardPanel, BoardTask } from '@/types/board';
 
@@ -26,7 +22,8 @@ export function useBoardDrag(
   isDisabled: boolean
 ) {
   const [activeTask, setActiveTask] = useState<BoardTask | null>(null);
-  const [, startTransition] = useTransition();
+  const panelsBeforeDrag = useRef(panels);
+  const runAction = useSafeTransition();
   const keyboardSensor = useSensor(KeyboardSensor, {
     coordinateGetter: sortableKeyboardCoordinates,
   });
@@ -40,6 +37,7 @@ export function useBoardDrag(
   );
 
   function handleDragStart({ active }: DragStartEvent) {
+    panelsBeforeDrag.current = panels;
     if (active.data.current?.type !== 'task') return;
     const panel = findPanelByTaskId(panels, String(active.id));
     setActiveTask(panel?.tasks.find((task) => task.id === active.id) ?? null);
@@ -57,6 +55,8 @@ export function useBoardDrag(
 
   function handleDragEnd({ active, over }: DragEndEvent) {
     setActiveTask(null);
+    const previousPanels = panelsBeforeDrag.current;
+    const rollback = () => setPanels(previousPanels);
     if (!over) return;
     const activeId = String(active.id);
     const overId = String(over.id);
@@ -67,7 +67,10 @@ export function useBoardDrag(
       const to = panels.findIndex((panel) => panel.id === overId);
       const reordered = arrayMove(panels, from, to);
       setPanels(reordered);
-      startTransition(() => reorderPanels(reordered.map((panel) => panel.id)));
+      runAction(
+        () => reorderPanels(reordered.map((panel) => panel.id)),
+        rollback
+      );
       return;
     }
 
@@ -80,7 +83,7 @@ export function useBoardDrag(
     setPanels((current) =>
       current.map((item) => (item.id === panel.id ? { ...item, tasks } : item))
     );
-    startTransition(() => moveTask(activeId, panel.id, to));
+    runAction(() => moveTask(activeId, panel.id, to), rollback);
   }
 
   return {
