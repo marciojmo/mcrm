@@ -17,7 +17,11 @@ import { TaskDialog } from '@/components/features/board/TaskDialog';
 import { TaskCard } from '@/components/features/board/TaskCard';
 import { AddTextForm } from '@/components/ui/AddTextForm';
 import { Button, buttonVariants } from '@/components/ui/Button';
-import { DRAG_ACCESSIBILITY } from '@/constants/dragAccessibility';
+import {
+  DRAG_ANNOUNCEMENTS,
+  DRAG_INSTRUCTIONS,
+  PAUSED_DRAG_INSTRUCTIONS,
+} from '@/constants/dragAccessibility';
 import { useBoardDrag } from '@/hooks/useBoardDrag';
 import { filterBoardPanels } from '@/lib/filterBoardPanels';
 import type { BoardLabel, BoardPanel, BoardUser } from '@/types/board';
@@ -70,13 +74,14 @@ export function Board({
     }
     router.push(`/dashboard/${reference.boardId}?task=${reference.taskId}`);
   }
+  const isDragPaused = isOnlyMine || filterLabelId !== null;
   const {
     sensors,
     activeTask,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
-  } = useBoardDrag(panels, setPanels, isOnlyMine || filterLabelId !== null);
+  } = useBoardDrag(panels, setPanels, isDragPaused);
 
   const visiblePanels = filterBoardPanels(panels, {
     memberId: isOnlyMine ? currentUserId : null,
@@ -96,7 +101,12 @@ export function Board({
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
-      accessibility={DRAG_ACCESSIBILITY}
+      accessibility={{
+        announcements: DRAG_ANNOUNCEMENTS,
+        screenReaderInstructions: isDragPaused
+          ? PAUSED_DRAG_INSTRUCTIONS
+          : DRAG_INSTRUCTIONS,
+      }}
     >
       <div className="flex items-center justify-between gap-4 px-4 pt-4">
         <BoardBreadcrumb boardId={boardId} boardName={boardName} />
@@ -124,6 +134,11 @@ export function Board({
           }
           onSelect={setFilterLabelId}
         />
+        {isDragPaused && (
+          <p role="status" className="text-xs text-muted-foreground">
+            Reordenar está pausado enquanto há filtro ativo
+          </p>
+        )}
       </div>
       <div className="flex flex-1 items-start gap-3 overflow-x-auto p-4">
         <SortableContext

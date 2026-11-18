@@ -32,6 +32,7 @@ export function SortableTask({
   } = useSortable({
     id: task.id,
     data: { type: 'task', name: task.title },
+    attributes: { roleDescription: 'tarefa arrastável' },
     disabled: { draggable: false, droppable: isPanelDragging },
   });
   const completion = useTaskCompletion(task.id, task.isCompleted);

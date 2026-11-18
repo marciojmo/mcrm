@@ -12,15 +12,21 @@ function describeItem(item: Active | Over) {
     : `a tarefa ${name}`;
 }
 
-const screenReaderInstructions: ScreenReaderInstructions = {
+const OPEN_TASK_INSTRUCTION = 'Em uma tarefa, pressione Enter para abri-la.';
+
+export const DRAG_INSTRUCTIONS: ScreenReaderInstructions = {
   draggable:
     'Para pegar uma tarefa ou um painel, pressione Espaço. ' +
     'Enquanto arrasta, use as setas para mover. ' +
     'Pressione Espaço de novo para soltar na nova posição ou Esc para cancelar. ' +
-    'Em uma tarefa, pressione Enter para abri-la.',
+    OPEN_TASK_INSTRUCTION,
 };
 
-const announcements: Announcements = {
+export const PAUSED_DRAG_INSTRUCTIONS: ScreenReaderInstructions = {
+  draggable: `Com um filtro ativo, o arrasto fica pausado. ${OPEN_TASK_INSTRUCTION}`,
+};
+
+export const DRAG_ANNOUNCEMENTS: Announcements = {
   onDragStart: ({ active }) => `Pegou ${describeItem(active)}.`,
   onDragOver: ({ active, over }) => {
     if (!over) return `Movendo ${describeItem(active)} fora da área de soltar.`;
@@ -35,5 +41,3 @@ const announcements: Announcements = {
   onDragCancel: ({ active }) =>
     `Cancelado: ${describeItem(active)} voltou à posição original.`,
 };
-
-export const DRAG_ACCESSIBILITY = { screenReaderInstructions, announcements };
