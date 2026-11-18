@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAttachment } from '@/services/attachmentService';
-import { assertAttachmentAccess } from '@/services/boardService';
+import { assertAttachmentReadAccess } from '@/services/boardService';
 import { readStoredFile } from '@/services/fileStorage';
 import { getSession } from '@/services/sessionService';
 
@@ -14,7 +14,7 @@ export async function GET(
   }
   const { id } = await params;
   try {
-    await assertAttachmentAccess(session.user.id, id);
+    await assertAttachmentReadAccess(session.user.id, id);
   } catch {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
