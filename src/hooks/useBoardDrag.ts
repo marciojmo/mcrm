@@ -58,7 +58,10 @@ export function useBoardDrag(
 
   function handleDragEnd({ active, over }: DragEndEvent) {
     setActiveTask(null);
-    if (!over) return;
+    if (!over) {
+      handleDragCancel();
+      return;
+    }
     const activeId = String(active.id);
     const overId = String(over.id);
 
