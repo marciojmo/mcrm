@@ -112,6 +112,10 @@ export async function createBoard(name: string, ownerId: string) {
   return prisma.board.create({ data: { name, key, ownerId } });
 }
 
+export async function renameBoard(boardId: string, name: string) {
+  return prisma.board.update({ where: { id: boardId }, data: { name } });
+}
+
 export async function addBoardMember(
   boardId: string,
   ownerId: string,

@@ -96,8 +96,17 @@ export function Board({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex items-center gap-4 px-4 pt-4">
+      <div className="flex items-center justify-between gap-4 px-4 pt-4">
         <BoardBreadcrumb boardId={boardId} boardName={boardName} />
+        <Link
+          href={`/dashboard/${boardId}/settings`}
+          aria-label="Configurações"
+          className={buttonVariants({ variant: 'outline', size: 'icon-sm' })}
+        >
+          <SettingsIcon />
+        </Link>
+      </div>
+      <div className="flex items-center gap-2 px-4 pt-3">
         <Button
           variant={isOnlyMine ? 'default' : 'outline'}
           size="sm"
@@ -113,13 +122,6 @@ export function Board({
           }
           onSelect={setFilterLabelId}
         />
-        <Link
-          href={`/dashboard/${boardId}/settings`}
-          aria-label="Configurações"
-          className={buttonVariants({ variant: 'outline', size: 'icon-sm' })}
-        >
-          <SettingsIcon />
-        </Link>
       </div>
       <div className="flex flex-1 items-start gap-3 overflow-x-auto p-4">
         <SortableContext
