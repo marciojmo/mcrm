@@ -1,9 +1,4 @@
-import {
-  useState,
-  useTransition,
-  type Dispatch,
-  type SetStateAction,
-} from 'react';
+import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import {
   KeyboardSensor,
   PointerSensor,
@@ -15,6 +10,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { moveTask, reorderPanels } from '@/app/(app)/dashboard/actions';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 import { findPanelByTaskId, moveTaskToPanel } from '@/lib/boardMoves';
 import type { BoardPanel, BoardTask } from '@/types/board';
 
@@ -26,7 +22,9 @@ export function useBoardDrag(
   isDisabled: boolean
 ) {
   const [activeTask, setActiveTask] = useState<BoardTask | null>(null);
-  const [, startTransition] = useTransition();
+  const savedPanels = useRef(panels);
+  const pendingMoveCount = useRef(0);
+  const { runAction } = useSafeTransition();
   const keyboardSensor = useSensor(KeyboardSensor, {
     coordinateGetter: sortableKeyboardCoordinates,
   });
@@ -40,6 +38,7 @@ export function useBoardDrag(
   );
 
   function handleDragStart({ active }: DragStartEvent) {
+    if (pendingMoveCount.current === 0) savedPanels.current = panels;
     if (active.data.current?.type !== 'task') return;
     const panel = findPanelByTaskId(panels, String(active.id));
     setActiveTask(panel?.tasks.find((task) => task.id === active.id) ?? null);
@@ -67,7 +66,7 @@ export function useBoardDrag(
       const to = panels.findIndex((panel) => panel.id === overId);
       const reordered = arrayMove(panels, from, to);
       setPanels(reordered);
-      startTransition(() => reorderPanels(reordered.map((panel) => panel.id)));
+      saveMove(() => reorderPanels(reordered.map((panel) => panel.id)));
       return;
     }
 
@@ -80,7 +79,15 @@ export function useBoardDrag(
     setPanels((current) =>
       current.map((item) => (item.id === panel.id ? { ...item, tasks } : item))
     );
-    startTransition(() => moveTask(activeId, panel.id, to));
+    saveMove(() => moveTask(activeId, panel.id, to));
+  }
+
+  async function saveMove(action: () => Promise<unknown>) {
+    pendingMoveCount.current += 1;
+    await runAction(action, {
+      onError: () => setPanels(savedPanels.current),
+    });
+    pendingMoveCount.current -= 1;
   }
 
   return {

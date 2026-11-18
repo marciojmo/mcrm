@@ -1,8 +1,6 @@
 'use client';
 
-import { useRef, useState, useTransition } from 'react';
 import { EyeIcon } from 'lucide-react';
-import { updateTask } from '@/app/(app)/dashboard/actions';
 import { toggleTaskLabel } from '@/app/(app)/dashboard/taskActions';
 import { LabelChip } from '@/components/features/board/LabelChip';
 import { AddAttachmentPopover } from '@/components/features/board/task/AddAttachmentPopover';
@@ -21,22 +19,10 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { MAX_DESCRIPTION_LENGTH } from '@/constants/task';
 import { useTaskCompletion } from '@/hooks/useTaskCompletion';
+import { useTaskDraft } from '@/hooks/useTaskDraft';
 import { useTaskExtras } from '@/hooks/useTaskExtras';
-import type {
-  BoardLabel,
-  BoardTask,
-  BoardUser,
-  TaskDetails,
-} from '@/types/board';
+import type { BoardLabel, BoardTask, BoardUser } from '@/types/board';
 import type { TaskReference } from '@/types/task';
-
-function normalizeDetails({ title, description, dueDate }: TaskDetails) {
-  return {
-    title: title.trim(),
-    description: description?.trim() || null,
-    dueDate,
-  };
-}
 
 interface TaskDialogProps {
   task: BoardTask;
@@ -57,40 +43,22 @@ export function TaskDialog({
   onClose,
   onOpenTask,
 }: TaskDialogProps) {
-  const [details, setDetails] = useState(() => normalizeDetails(task));
-  const savedDetails = useRef(details);
-  const [, startTransition] = useTransition();
+  const { details, setDetails, isPending, runAction, saveField, close } =
+    useTaskDraft(task, onClose);
   const { extras, reload } = useTaskExtras(task.id);
   const completion = useTaskCompletion(task.id, task.isCompleted);
   const taskLabels = labels.filter((label) => task.labelIds.includes(label.id));
   const isFollowing = task.followerIds.includes(currentUserId);
   const members = users.filter((user) => task.memberIds.includes(user.id));
 
-  function save(changes: Partial<TaskDetails>) {
-    const merged = { ...details, ...changes };
-    const next = merged.title.trim()
-      ? merged
-      : { ...merged, title: savedDetails.current.title };
-    setDetails(next);
-    const normalized = normalizeDetails(next);
-    if (JSON.stringify(normalized) === JSON.stringify(savedDetails.current))
-      return;
-    savedDetails.current = normalized;
-    startTransition(() => updateTask(task.id, next));
-  }
-
-  function close() {
-    save({});
-    onClose();
-  }
-
   return (
     <Dialog open onOpenChange={(isOpen) => !isOpen && close()}>
       <DialogContent className="flex h-[80vh] w-[80vw] max-w-none gap-0 p-0 sm:max-w-none">
         <DialogTitle className="sr-only">Detalhes da tarefa</DialogTitle>
         <div className="flex min-h-0 w-[65%] flex-col gap-4 p-4">
-          <span className="-mb-3 font-mono text-xs text-muted-foreground">
+          <span className="-mb-3 flex gap-2 font-mono text-xs text-muted-foreground">
             {task.identifier}
+            <span aria-live="polite">{isPending ? 'Salvando…' : ''}</span>
           </span>
           <div className="flex items-center gap-2">
             <TaskCheckbox
@@ -106,7 +74,7 @@ export function TaskDialog({
               onChange={(event) =>
                 setDetails({ ...details, title: event.target.value })
               }
-              onBlur={() => save({})}
+              onBlur={() => saveField()}
             />
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -116,7 +84,7 @@ export function TaskDialog({
             <AddAttachmentPopover taskId={task.id} onChange={reload} />
             <DueDateField
               value={details.dueDate}
-              onChange={(dueDate) => save({ dueDate })}
+              onChange={(dueDate) => saveField({ dueDate })}
             />
             {isFollowing && (
               <span className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -141,9 +109,7 @@ export function TaskDialog({
                       key={label.id}
                       label={label}
                       onRemove={() =>
-                        startTransition(() =>
-                          toggleTaskLabel(task.id, label.id)
-                        )
+                        runAction(() => toggleTaskLabel(task.id, label.id))
                       }
                     />
                   ))}
@@ -163,7 +129,7 @@ export function TaskDialog({
                 onChange={(event) =>
                   setDetails({ ...details, description: event.target.value })
                 }
-                onBlur={() => save({})}
+                onBlur={() => saveField()}
               />
             </label>
             {extras?.checklists.map((checklist) => (
