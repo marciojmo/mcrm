@@ -10,6 +10,7 @@ import { AddChecklistPopover } from '@/components/features/board/task/AddCheckli
 import { AttachmentsSection } from '@/components/features/board/task/AttachmentsSection';
 import { ChecklistBlock } from '@/components/features/board/task/ChecklistBlock';
 import { CommentsSection } from '@/components/features/board/task/CommentsSection';
+import { DueDateField } from '@/components/features/board/task/DueDateField';
 import { LabelsPopover } from '@/components/features/board/task/LabelsPopover';
 import { MembersPopover } from '@/components/features/board/task/MembersPopover';
 import { TaskMenu } from '@/components/features/board/task/TaskMenu';
@@ -18,6 +19,7 @@ import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { MAX_DESCRIPTION_LENGTH } from '@/constants/task';
 import { useTaskCompletion } from '@/hooks/useTaskCompletion';
 import { useTaskExtras } from '@/hooks/useTaskExtras';
 import type {
@@ -112,17 +114,10 @@ export function TaskDialog({
             <MembersPopover task={task} users={users} />
             <AddChecklistPopover taskId={task.id} onChange={reload} />
             <AddAttachmentPopover taskId={task.id} onChange={reload} />
-            <label className="flex items-center gap-2 text-sm font-medium">
-              Prazo
-              <Input
-                type="date"
-                className="w-40"
-                value={details.dueDate ?? ''}
-                onChange={(event) =>
-                  save({ dueDate: event.target.value || null })
-                }
-              />
-            </label>
+            <DueDateField
+              value={details.dueDate}
+              onChange={(dueDate) => save({ dueDate })}
+            />
             {isFollowing && (
               <span className="flex items-center gap-1 text-sm text-muted-foreground">
                 <EyeIcon className="size-4" />
@@ -161,6 +156,7 @@ export function TaskDialog({
               Descrição
               <Textarea
                 rows={5}
+                maxLength={MAX_DESCRIPTION_LENGTH}
                 value={details.description ?? ''}
                 placeholder="Adicione uma descrição"
                 className="font-normal"

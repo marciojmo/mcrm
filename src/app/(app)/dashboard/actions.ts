@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { MAX_DESCRIPTION_LENGTH } from '@/constants/task';
 import type { TaskDetails } from '@/types/board';
 import { requireSession } from '@/services/sessionService';
 import {
@@ -31,7 +32,6 @@ import {
 } from '@/services/taskService';
 
 const MAX_TEXT_LENGTH = 200;
-const MAX_DESCRIPTION_LENGTH = 10_000;
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 function cleanText(value: string) {
