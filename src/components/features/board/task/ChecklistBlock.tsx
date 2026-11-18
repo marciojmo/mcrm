@@ -37,14 +37,23 @@ export function ChecklistBlock({ checklist, onChange }: ChecklistBlockProps) {
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">{checklist.title}</h3>
         {isConfirmingDelete ? (
-          <Button
-            variant="destructive"
-            size="xs"
-            disabled={isPending}
-            onClick={() => run(() => deleteChecklist(checklist.id))}
-          >
-            Confirmar exclusão
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              variant="destructive"
+              size="xs"
+              disabled={isPending}
+              onClick={() => run(() => deleteChecklist(checklist.id))}
+            >
+              Confirmar exclusão
+            </Button>
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={() => setIsConfirmingDelete(false)}
+            >
+              Cancelar
+            </Button>
+          </div>
         ) : (
           <Button
             variant="ghost"
