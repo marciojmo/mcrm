@@ -23,7 +23,7 @@ interface LabelsPopoverProps {
 export function LabelsPopover({ task, labels }: LabelsPopoverProps) {
   const [query, setQuery] = useState('');
   const [editing, setEditing] = useState<BoardLabel | 'new' | null>(null);
-  const runAction = useSafeTransition();
+  const { runAction } = useSafeTransition();
   const matches = labels.filter((label) =>
     label.name.toLowerCase().includes(query.trim().toLowerCase())
   );

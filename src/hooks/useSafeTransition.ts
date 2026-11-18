@@ -1,26 +1,37 @@
 import { useTransition } from 'react';
-import { unstable_rethrow, useRouter } from 'next/navigation';
+import { unstable_rethrow } from 'next/navigation';
 import { useToast } from '@/components/ui/Toast';
 
-const SAVE_ERROR_MESSAGE = 'Não foi possível salvar. Tente novamente.';
+export const SAVE_ERROR_MESSAGE = 'Não foi possível salvar. Tente novamente.';
+
+interface ActionOptions {
+  onError?: () => void;
+  errorMessage?: string | null;
+}
 
 export function useSafeTransition() {
-  const router = useRouter();
   const toast = useToast();
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
 
-  function runAction(action: () => Promise<unknown>, onError?: () => void) {
-    startTransition(async () => {
-      try {
-        await action();
-      } catch (error) {
-        unstable_rethrow(error);
-        onError?.();
-        toast.add({ title: SAVE_ERROR_MESSAGE });
-        router.refresh();
-      }
-    });
+  function runAction(
+    action: () => Promise<unknown>,
+    { onError, errorMessage = SAVE_ERROR_MESSAGE }: ActionOptions = {}
+  ) {
+    return new Promise<boolean>((resolve) =>
+      startTransition(async () => {
+        try {
+          await action();
+          resolve(true);
+        } catch (error) {
+          unstable_rethrow(error);
+          onError?.();
+          if (errorMessage)
+            toast.add({ title: errorMessage, priority: 'high' });
+          resolve(false);
+        }
+      })
+    );
   }
 
-  return runAction;
+  return { isPending, runAction };
 }

@@ -5,7 +5,7 @@ import { useSafeTransition } from '@/hooks/useSafeTransition';
 export function useTaskCompletion(taskId: string, isCompleted: boolean) {
   const [isOptimisticallyCompleted, setIsOptimisticallyCompleted] =
     useOptimistic(isCompleted);
-  const runAction = useSafeTransition();
+  const { runAction } = useSafeTransition();
 
   function toggle() {
     runAction(async () => {

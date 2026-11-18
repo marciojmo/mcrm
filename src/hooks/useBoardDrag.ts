@@ -22,8 +22,9 @@ export function useBoardDrag(
   isDisabled: boolean
 ) {
   const [activeTask, setActiveTask] = useState<BoardTask | null>(null);
-  const panelsBeforeDrag = useRef(panels);
-  const runAction = useSafeTransition();
+  const savedPanels = useRef(panels);
+  const pendingMoveCount = useRef(0);
+  const { runAction } = useSafeTransition();
   const keyboardSensor = useSensor(KeyboardSensor, {
     coordinateGetter: sortableKeyboardCoordinates,
   });
@@ -37,7 +38,7 @@ export function useBoardDrag(
   );
 
   function handleDragStart({ active }: DragStartEvent) {
-    panelsBeforeDrag.current = panels;
+    if (pendingMoveCount.current === 0) savedPanels.current = panels;
     if (active.data.current?.type !== 'task') return;
     const panel = findPanelByTaskId(panels, String(active.id));
     setActiveTask(panel?.tasks.find((task) => task.id === active.id) ?? null);
@@ -55,8 +56,6 @@ export function useBoardDrag(
 
   function handleDragEnd({ active, over }: DragEndEvent) {
     setActiveTask(null);
-    const previousPanels = panelsBeforeDrag.current;
-    const rollback = () => setPanels(previousPanels);
     if (!over) return;
     const activeId = String(active.id);
     const overId = String(over.id);
@@ -67,10 +66,7 @@ export function useBoardDrag(
       const to = panels.findIndex((panel) => panel.id === overId);
       const reordered = arrayMove(panels, from, to);
       setPanels(reordered);
-      runAction(
-        () => reorderPanels(reordered.map((panel) => panel.id)),
-        rollback
-      );
+      saveMove(() => reorderPanels(reordered.map((panel) => panel.id)));
       return;
     }
 
@@ -83,7 +79,15 @@ export function useBoardDrag(
     setPanels((current) =>
       current.map((item) => (item.id === panel.id ? { ...item, tasks } : item))
     );
-    runAction(() => moveTask(activeId, panel.id, to), rollback);
+    saveMove(() => moveTask(activeId, panel.id, to));
+  }
+
+  async function saveMove(action: () => Promise<unknown>) {
+    pendingMoveCount.current += 1;
+    await runAction(action, {
+      onError: () => setPanels(savedPanels.current),
+    });
+    pendingMoveCount.current -= 1;
   }
 
   return {
