@@ -60,7 +60,8 @@ export function BoardNameEditor({ boardId, boardName }: BoardNameEditorProps) {
     <button
       ref={buttonRef}
       type="button"
-      className="cursor-text truncate rounded-md px-1 font-medium text-foreground hover:bg-muted"
+      aria-label={`Renomear quadro ${boardName}`}
+      className="cursor-text truncate rounded-md px-1 font-medium text-foreground outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
       onClick={startEditing}
     >
       {boardName}
