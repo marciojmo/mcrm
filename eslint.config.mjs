@@ -38,7 +38,7 @@ export default defineConfig([
     'build/**',
     'next-env.d.ts',
     'src/generated/**',
-    '.claude/**',
+    '.claude/worktrees/**',
   ]),
   {
     files: ['**/*.{ts,tsx}'],
