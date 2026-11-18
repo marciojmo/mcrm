@@ -23,25 +23,33 @@ export function useTaskDraft(task: BoardTask, onClose: () => void) {
   const savedDetails = useRef(details);
   const pendingSave = useRef<{ key: string; isSaved: Promise<boolean> }>(null);
   const isClosing = useRef(false);
-  const hasFailedToClose = useRef(false);
+  const failedCloseKey = useRef<string>(null);
+  const isDiscarded = useRef(false);
   const toast = useToast();
   const { isPending, runAction } = useSafeTransition();
 
-  function save(changes: Partial<TaskDetails>) {
+  function getDraft(changes: Partial<TaskDetails>) {
     const merged = { ...details, ...changes };
     const next = merged.title.trim()
       ? merged
       : { ...merged, title: savedDetails.current.title };
-    setDetails(next);
     const normalized = normalizeDetails(next);
-    const key = JSON.stringify(normalized);
+    return { next, normalized, key: JSON.stringify(normalized) };
+  }
+
+  function save(changes: Partial<TaskDetails>) {
+    const { next, normalized, key } = getDraft(changes);
+    setDetails(next);
     if (pendingSave.current?.key === key) return pendingSave.current.isSaved;
     if (key === JSON.stringify(savedDetails.current))
       return Promise.resolve(true);
     const isSaved = runAction(() => updateTask(task.id, next), {
       errorMessage: null,
     }).then((isOk) => {
-      if (isOk) savedDetails.current = normalized;
+      if (isOk) {
+        savedDetails.current = normalized;
+        failedCloseKey.current = null;
+      }
       if (pendingSave.current?.isSaved === isSaved) pendingSave.current = null;
       return isOk;
     });
@@ -51,18 +59,22 @@ export function useTaskDraft(task: BoardTask, onClose: () => void) {
 
   async function saveField(changes: Partial<TaskDetails> = {}) {
     const isSaved = await save(changes);
-    if (!isSaved && !isClosing.current)
+    if (!isSaved && !isClosing.current && !isDiscarded.current)
       toast.add({ title: SAVE_ERROR_MESSAGE, priority: 'high' });
   }
 
   async function close() {
     if (isClosing.current) return;
-    if (hasFailedToClose.current) return onClose();
+    const { key } = getDraft({});
+    if (key === failedCloseKey.current) {
+      isDiscarded.current = true;
+      return onClose();
+    }
     isClosing.current = true;
     const isSaved = await save({});
     isClosing.current = false;
     if (isSaved) return onClose();
-    hasFailedToClose.current = true;
+    failedCloseKey.current = key;
     toast.add({ title: DISCARD_WARNING, priority: 'high' });
   }
 
