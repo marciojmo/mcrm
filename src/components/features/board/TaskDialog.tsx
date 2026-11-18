@@ -66,11 +66,24 @@ export function TaskDialog({
       return;
     }
     setDetails(next);
-    startTransition(() => updateTask(task.id, next));
+    if (hasChanged(next)) startTransition(() => updateTask(task.id, next));
+  }
+
+  function hasChanged(next: TaskDetails) {
+    return (
+      next.title !== task.title ||
+      (next.description ?? '') !== (task.description ?? '') ||
+      next.dueDate !== task.dueDate
+    );
+  }
+
+  function close() {
+    save({});
+    onClose();
   }
 
   return (
-    <Dialog open onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open onOpenChange={(isOpen) => !isOpen && close()}>
       <DialogContent className="flex h-[80vh] w-[80vw] max-w-none gap-0 p-0 sm:max-w-none">
         <DialogTitle className="sr-only">Detalhes da tarefa</DialogTitle>
         <div className="flex min-h-0 w-[65%] flex-col gap-4 p-4">
