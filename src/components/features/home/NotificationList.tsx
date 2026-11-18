@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { markMentionSeen } from '@/app/(app)/home/actions';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { MarkMentionSeenButton } from '@/components/features/home/MarkMentionSeenButton';
 import { cn } from '@/lib/utils';
@@ -24,6 +27,9 @@ export function NotificationList({ mentions }: { mentions: HomeMention[] }) {
         >
           <Link
             href={`/dashboard?task=${mention.taskId}&comment=${mention.id}`}
+            onClick={
+              mention.isSeen ? undefined : () => markMentionSeen(mention.id)
+            }
             className="flex min-w-0 flex-1 gap-3 rounded-lg p-3 text-sm hover:bg-muted"
           >
             <UserAvatar user={mention.author} />
