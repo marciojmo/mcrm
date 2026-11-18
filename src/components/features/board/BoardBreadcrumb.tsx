@@ -18,7 +18,10 @@ export function BoardBreadcrumb({
       aria-label="Caminho"
       className="flex items-center gap-1 text-sm text-muted-foreground"
     >
-      <Link href="/dashboard" className="hover:text-foreground">
+      <Link
+        href="/dashboard"
+        className="rounded-sm outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
         Quadros
       </Link>
       <ChevronRightIcon className="size-4" />
@@ -26,7 +29,7 @@ export function BoardBreadcrumb({
         <>
           <Link
             href={`/dashboard/${boardId}`}
-            className="hover:text-foreground"
+            className="rounded-sm outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             {boardName}
           </Link>
