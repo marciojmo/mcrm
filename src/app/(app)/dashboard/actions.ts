@@ -12,6 +12,7 @@ import {
   assertTaskAccess,
   createBoard as createBoardRecord,
   removeBoardMember as removeBoardMemberRecord,
+  renameBoard as renameBoardRecord,
 } from '@/services/boardService';
 import {
   archivePanel as archivePanelRecord,
@@ -43,6 +44,13 @@ export async function createBoard(name: string) {
   const board = await createBoardRecord(cleanText(name), user.id);
   revalidatePath('/dashboard', 'layout');
   redirect(`/dashboard/${board.id}`);
+}
+
+export async function renameBoard(boardId: string, name: string) {
+  const { user } = await requireSession();
+  await assertBoardAccess(user.id, boardId);
+  await renameBoardRecord(boardId, cleanText(name));
+  revalidatePath('/dashboard', 'layout');
 }
 
 export async function addBoardMember(boardId: string, userId: string) {

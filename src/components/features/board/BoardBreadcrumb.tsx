@@ -1,5 +1,6 @@
 import { ChevronRightIcon } from 'lucide-react';
 import Link from 'next/link';
+import { BoardNameEditor } from '@/components/features/board/BoardNameEditor';
 
 interface BoardBreadcrumbProps {
   boardId: string;
@@ -33,7 +34,7 @@ export function BoardBreadcrumb({
           <span className="font-medium text-foreground">Configurações</span>
         </>
       ) : (
-        <span className="font-medium text-foreground">{boardName}</span>
+        <BoardNameEditor boardId={boardId} boardName={boardName} />
       )}
     </nav>
   );
