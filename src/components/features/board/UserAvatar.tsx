@@ -3,7 +3,7 @@ import type { BoardUser } from '@/types/board';
 
 export function UserAvatar({ user }: { user: BoardUser }) {
   return (
-    <Avatar size="sm">
+    <Avatar size="sm" title={user.name} role="img" aria-label={user.name}>
       <AvatarImage src={user.image ?? undefined} alt={user.name} />
       <AvatarFallback>{user.name.slice(0, 1)}</AvatarFallback>
     </Avatar>
