@@ -70,12 +70,15 @@ export async function reorderPanels(panelIds: string[]) {
 }
 
 export async function renamePanel(panelId: string, name: string) {
-  return prisma.panel.update({ where: { id: panelId }, data: { name } });
+  return prisma.panel.update({
+    where: { id: panelId, archivedAt: null },
+    data: { name },
+  });
 }
 
 export async function archivePanel(panelId: string) {
   return prisma.panel.update({
-    where: { id: panelId },
+    where: { id: panelId, archivedAt: null },
     data: { archivedAt: new Date() },
   });
 }
