@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { SquareCheckIcon } from 'lucide-react';
 import { addChecklist } from '@/app/(app)/dashboard/taskActions';
 import { Button, buttonVariants } from '@/components/ui/Button';
@@ -10,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/Popover';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface AddChecklistPopoverProps {
   taskId: string;
@@ -22,12 +23,12 @@ export function AddChecklistPopover({
 }: AddChecklistPopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('Checklist');
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!title.trim()) return;
-    startTransition(async () => {
+    runAction(async () => {
       await addChecklist(taskId, title);
       await onChange();
       setIsOpen(false);

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { addComment } from '@/app/(app)/dashboard/taskActions';
 import { CommentItem } from '@/components/features/board/task/CommentItem';
 import { MentionTextarea } from '@/components/features/board/task/MentionTextarea';
 import { Button } from '@/components/ui/Button';
 import type { BoardUser } from '@/types/board';
 import type { TaskComment, TaskReference } from '@/types/task';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface CommentsSectionProps {
   taskId: string;
@@ -31,11 +32,11 @@ export function CommentsSection({
 }: CommentsSectionProps) {
   const [body, setBody] = useState('');
   const [mentionedIds, setMentionedIds] = useState<string[]>([]);
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
 
   function submit() {
     if (!body.trim()) return;
-    startTransition(async () => {
+    runAction(async () => {
       await addComment(taskId, body, mentionedIds);
       await onChange();
       setBody('');

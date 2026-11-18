@@ -1,6 +1,5 @@
 'use client';
 
-import { useTransition } from 'react';
 import { archiveBoard } from '@/app/(app)/dashboard/actions';
 import { Button } from '@/components/ui/Button';
 import {
@@ -11,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface ArchiveBoardDialogProps {
   boardId: string;
@@ -25,7 +25,7 @@ export function ArchiveBoardDialog({
   isOpen,
   onOpenChange,
 }: ArchiveBoardDialogProps) {
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -44,7 +44,7 @@ export function ArchiveBoardDialog({
           <Button
             variant="destructive"
             disabled={isPending}
-            onClick={() => startTransition(() => archiveBoard(boardId))}
+            onClick={() => runAction(() => archiveBoard(boardId))}
           >
             Arquivar quadro
           </Button>

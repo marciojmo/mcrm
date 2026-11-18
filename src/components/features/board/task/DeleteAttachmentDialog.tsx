@@ -1,6 +1,5 @@
 'use client';
 
-import { useTransition } from 'react';
 import { deleteAttachment } from '@/app/(app)/dashboard/taskActions';
 import { Button } from '@/components/ui/Button';
 import {
@@ -11,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface DeleteAttachmentDialogProps {
   attachmentId: string;
@@ -27,10 +27,10 @@ export function DeleteAttachmentDialog({
   onOpenChange,
   onDeleted,
 }: DeleteAttachmentDialogProps) {
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
 
   function confirm() {
-    startTransition(async () => {
+    runAction(async () => {
       await deleteAttachment(attachmentId);
       await onDeleted();
       onOpenChange(false);

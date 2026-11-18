@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { addBoardMember } from '@/app/(app)/dashboard/actions';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Input } from '@/components/ui/Input';
 import type { BoardUser } from '@/types/board';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface AddBoardMemberSearchProps {
   boardId: string;
@@ -16,7 +17,7 @@ export function AddBoardMemberSearch({
   candidates,
 }: AddBoardMemberSearchProps) {
   const [query, setQuery] = useState('');
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
   const term = query.trim().toLowerCase();
   const matches = term
     ? candidates.filter((candidate) =>
@@ -25,7 +26,7 @@ export function AddBoardMemberSearch({
     : [];
 
   function add(userId: string) {
-    startTransition(async () => {
+    runAction(async () => {
       await addBoardMember(boardId, userId);
       setQuery('');
     });

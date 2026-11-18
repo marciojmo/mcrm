@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   deleteComment,
   updateComment,
@@ -13,6 +13,7 @@ import { ConfirmDeleteButton } from '@/components/ui/ConfirmDeleteButton';
 import { cn } from '@/lib/utils';
 import type { BoardUser } from '@/types/board';
 import type { TaskComment, TaskReference } from '@/types/task';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface CommentItemProps {
   comment: TaskComment;
@@ -40,11 +41,11 @@ export function CommentItem({
   const [isEditing, setIsEditing] = useState(false);
   const [body, setBody] = useState(comment.body);
   const [mentionedIds, setMentionedIds] = useState(comment.mentionedUserIds);
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
   const isOwn = comment.author.id === currentUserId;
 
   function run(action: () => Promise<void>, onDone?: () => void) {
-    startTransition(async () => {
+    runAction(async () => {
       await action();
       await onChange();
       onDone?.();

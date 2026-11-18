@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useTransition } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PaperclipIcon } from 'lucide-react';
 import { addLinkAttachment } from '@/app/(app)/dashboard/taskActions';
@@ -12,6 +12,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/Popover';
 import { MAX_UPLOAD_BYTES } from '@/constants/storage';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface AddAttachmentPopoverProps {
   taskId: string;
@@ -28,7 +29,7 @@ export function AddAttachmentPopover({
   const [url, setUrl] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
 
   function finish() {
     setUrl('');
@@ -42,7 +43,7 @@ export function AddAttachmentPopover({
       setError('Arquivo maior que 10 MB.');
       return;
     }
-    startTransition(async () => {
+    runAction(async () => {
       const form = new FormData();
       form.set('taskId', taskId);
       form.set('file', file);
@@ -59,7 +60,7 @@ export function AddAttachmentPopover({
 
   function attachLink(event: React.FormEvent) {
     event.preventDefault();
-    startTransition(async () => {
+    runAction(async () => {
       try {
         await addLinkAttachment(taskId, url, name);
       } catch {

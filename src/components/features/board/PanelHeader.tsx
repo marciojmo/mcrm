@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  useTransition,
-  type HTMLAttributes,
-} from 'react';
+import { useEffect, useRef, useState, type HTMLAttributes } from 'react';
 import { MoreHorizontalIcon } from 'lucide-react';
 import { renamePanel } from '@/app/(app)/dashboard/actions';
 import { ArchivePanelDialog } from '@/components/features/board/ArchivePanelDialog';
@@ -18,6 +12,7 @@ import {
 } from '@/components/ui/DropdownMenu';
 import { Input } from '@/components/ui/Input';
 import type { BoardPanel } from '@/types/board';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface PanelHeaderProps {
   panel: BoardPanel;
@@ -33,7 +28,7 @@ export function PanelHeader({
   const [isEditing, setIsEditing] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
   const [name, setName] = useState(panel.name);
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
   const nameButtonRef = useRef<HTMLButtonElement>(null);
   const hasEdited = useRef(false);
 
@@ -52,7 +47,7 @@ export function PanelHeader({
     if (isPending) return;
     const trimmed = name.trim();
     if (!trimmed || trimmed === panel.name) return setIsEditing(false);
-    startTransition(async () => {
+    runAction(async () => {
       await renamePanel(panel.id, trimmed);
       setIsEditing(false);
     });
