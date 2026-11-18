@@ -28,6 +28,7 @@ export function PanelColumn({
 }: PanelColumnProps) {
   const {
     setNodeRef,
+    setActivatorNodeRef,
     attributes,
     listeners,
     transform,
@@ -44,7 +45,15 @@ export function PanelColumn({
         isDragging && 'opacity-50'
       )}
     >
-      <PanelHeader panel={panel} dragProps={{ ...attributes, ...listeners }} />
+      <PanelHeader
+        panel={panel}
+        dragHandleRef={setActivatorNodeRef}
+        dragProps={{
+          ...attributes,
+          ...listeners,
+          'aria-label': `Mover painel ${panel.name}`,
+        }}
+      />
       <div className="flex min-h-2 flex-col gap-2 overflow-y-auto">
         <SortableContext
           items={panel.tasks.map((task) => task.id)}

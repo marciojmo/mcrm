@@ -1,5 +1,6 @@
 'use client';
 
+import { useDndContext } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { TaskCard } from '@/components/features/board/TaskCard';
@@ -19,6 +20,8 @@ export function SortableTask({
   labels,
   onOpen,
 }: SortableTaskProps) {
+  const { active } = useDndContext();
+  const isPanelDragging = active?.data.current?.type === 'panel';
   const {
     setNodeRef,
     attributes,
@@ -26,7 +29,11 @@ export function SortableTask({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task.id, data: { type: 'task' } });
+  } = useSortable({
+    id: task.id,
+    data: { type: 'task' },
+    disabled: { draggable: false, droppable: isPanelDragging },
+  });
   const completion = useTaskCompletion(task.id, task.isCompleted);
 
   return (
@@ -38,10 +45,15 @@ export function SortableTask({
       labels={labels}
       isGhost={isDragging}
       onClick={onOpen}
-      className="cursor-grab touch-none"
+      className="cursor-grab touch-none outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' && !isDragging) return onOpen();
+        listeners?.onKeyDown?.(event);
+      }}
     />
   );
 }
