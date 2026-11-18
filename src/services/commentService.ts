@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma';
 
+const ACTIVE_TASK = { archivedAt: null, panel: { archivedAt: null } };
+
 export async function addComment(
   taskId: string,
   authorId: string,
@@ -38,7 +40,7 @@ export async function updateComment(
   mentionedUserIds: string[]
 ) {
   const comment = await prisma.comment.findFirst({
-    where: { id: commentId, authorId },
+    where: { id: commentId, authorId, task: ACTIVE_TASK },
     select: { taskId: true },
   });
   if (!comment) throw new Error('Comment not found');
@@ -67,7 +69,7 @@ export async function markMentionSeen(commentId: string, userId: string) {
 
 export async function deleteComment(commentId: string, authorId: string) {
   const { count } = await prisma.comment.deleteMany({
-    where: { id: commentId, authorId },
+    where: { id: commentId, authorId, task: ACTIVE_TASK },
   });
   if (count === 0) throw new Error('Comment not found');
 }

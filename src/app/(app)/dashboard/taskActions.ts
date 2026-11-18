@@ -33,6 +33,7 @@ import {
   assertChecklistItemAccess,
   assertLabelAccess,
   assertTaskAccess,
+  assertTaskReadAccess,
 } from '@/services/boardService';
 import { requireSession } from '@/services/sessionService';
 import { getTaskExtras as getTaskExtrasRecord } from '@/services/taskExtrasService';
@@ -66,7 +67,7 @@ async function refresh() {
 
 export async function getTaskExtras(taskId: string) {
   const { user } = await requireSession();
-  await assertTaskAccess(user.id, taskId);
+  await assertTaskReadAccess(user.id, taskId);
   return getTaskExtrasRecord(taskId, user.id);
 }
 
