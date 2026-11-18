@@ -9,6 +9,7 @@ import { CommentBody } from '@/components/features/board/task/CommentBody';
 import { MentionTextarea } from '@/components/features/board/task/MentionTextarea';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Button } from '@/components/ui/Button';
+import { ConfirmDeleteButton } from '@/components/ui/ConfirmDeleteButton';
 import { cn } from '@/lib/utils';
 import type { BoardUser } from '@/types/board';
 import type { TaskComment, TaskReference } from '@/types/task';
@@ -37,17 +38,16 @@ export function CommentItem({
     if (isHighlighted) itemRef.current?.scrollIntoView({ block: 'center' });
   }, [isHighlighted]);
   const [isEditing, setIsEditing] = useState(false);
-  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [body, setBody] = useState(comment.body);
   const [mentionedIds, setMentionedIds] = useState(comment.mentionedUserIds);
   const [isPending, startTransition] = useTransition();
   const isOwn = comment.author.id === currentUserId;
 
-  function run(action: () => Promise<void>, onDone: () => void) {
+  function run(action: () => Promise<void>, onDone?: () => void) {
     startTransition(async () => {
       await action();
       await onChange();
-      onDone();
+      onDone?.();
     });
   }
 
@@ -121,29 +121,12 @@ export function CommentItem({
             >
               Editar
             </Button>
-            {isConfirmingDelete ? (
-              <Button
-                size="xs"
-                variant="destructive"
-                disabled={isPending}
-                onClick={() =>
-                  run(
-                    () => deleteComment(comment.id),
-                    () => setIsConfirmingDelete(false)
-                  )
-                }
-              >
-                Confirmar exclusão
-              </Button>
-            ) : (
-              <Button
-                size="xs"
-                variant="ghost"
-                onClick={() => setIsConfirmingDelete(true)}
-              >
-                Excluir
-              </Button>
-            )}
+            <ConfirmDeleteButton
+              isPending={isPending}
+              onConfirm={() => run(() => deleteComment(comment.id))}
+            >
+              Excluir
+            </ConfirmDeleteButton>
           </div>
         )}
       </div>

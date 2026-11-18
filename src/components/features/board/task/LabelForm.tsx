@@ -9,6 +9,7 @@ import {
 } from '@/app/(app)/dashboard/taskActions';
 import { LabelChip } from '@/components/features/board/LabelChip';
 import { Button } from '@/components/ui/Button';
+import { ConfirmDeleteButton } from '@/components/ui/ConfirmDeleteButton';
 import { Input } from '@/components/ui/Input';
 import { LABEL_COLORS } from '@/constants/labelColors';
 import { cn } from '@/lib/utils';
@@ -22,7 +23,6 @@ interface LabelFormProps {
 export function LabelForm({ label, onDone }: LabelFormProps) {
   const [name, setName] = useState(label?.name ?? '');
   const [color, setColor] = useState(label?.color ?? LABEL_COLORS[0]);
-  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function run(action: () => Promise<void>) {
@@ -80,25 +80,15 @@ export function LabelForm({ label, onDone }: LabelFormProps) {
         <Button size="sm" disabled={isPending} onClick={save}>
           {label ? 'Salvar' : 'Criar'}
         </Button>
-        {label &&
-          (isConfirmingDelete ? (
-            <Button
-              size="sm"
-              variant="destructive"
-              disabled={isPending}
-              onClick={() => run(() => deleteLabel(label.id))}
-            >
-              Confirmar exclusão
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setIsConfirmingDelete(true)}
-            >
-              Excluir
-            </Button>
-          ))}
+        {label && (
+          <ConfirmDeleteButton
+            size="sm"
+            isPending={isPending}
+            onConfirm={() => run(() => deleteLabel(label.id))}
+          >
+            Excluir
+          </ConfirmDeleteButton>
+        )}
       </div>
     </div>
   );

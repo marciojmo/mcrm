@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useTransition } from 'react';
 import { Trash2Icon, XIcon } from 'lucide-react';
 import {
   addChecklistItem,
@@ -10,6 +10,7 @@ import {
 } from '@/app/(app)/dashboard/taskActions';
 import { AddTextForm } from '@/components/ui/AddTextForm';
 import { Button } from '@/components/ui/Button';
+import { ConfirmDeleteButton } from '@/components/ui/ConfirmDeleteButton';
 import type { Checklist } from '@/types/task';
 
 interface ChecklistBlockProps {
@@ -19,7 +20,6 @@ interface ChecklistBlockProps {
 
 export function ChecklistBlock({ checklist, onChange }: ChecklistBlockProps) {
   const [isPending, startTransition] = useTransition();
-  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const doneCount = checklist.items.filter((item) => item.isDone).length;
   const percent = checklist.items.length
     ? Math.round((doneCount / checklist.items.length) * 100)
@@ -36,33 +36,12 @@ export function ChecklistBlock({ checklist, onChange }: ChecklistBlockProps) {
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">{checklist.title}</h3>
-        {isConfirmingDelete ? (
-          <div className="flex gap-1">
-            <Button
-              variant="destructive"
-              size="xs"
-              disabled={isPending}
-              onClick={() => run(() => deleteChecklist(checklist.id))}
-            >
-              Confirmar exclusão
-            </Button>
-            <Button
-              variant="ghost"
-              size="xs"
-              onClick={() => setIsConfirmingDelete(false)}
-            >
-              Cancelar
-            </Button>
-          </div>
-        ) : (
-          <Button
-            variant="ghost"
-            size="xs"
-            onClick={() => setIsConfirmingDelete(true)}
-          >
-            <Trash2Icon /> Excluir
-          </Button>
-        )}
+        <ConfirmDeleteButton
+          isPending={isPending}
+          onConfirm={() => run(() => deleteChecklist(checklist.id))}
+        >
+          <Trash2Icon /> Excluir
+        </ConfirmDeleteButton>
       </div>
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         {percent}%
