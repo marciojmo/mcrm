@@ -16,6 +16,9 @@ export function LabelChip({
   return (
     <span
       style={{ backgroundColor: label.color }}
+      title={isCompact ? label.name || label.color : undefined}
+      role={isCompact ? 'img' : undefined}
+      aria-label={isCompact ? label.name || label.color : undefined}
       className={cn(
         'max-w-full rounded px-2 text-xs font-medium text-black/80',
         onRemove ? 'inline-flex items-center gap-1' : 'inline-block truncate',

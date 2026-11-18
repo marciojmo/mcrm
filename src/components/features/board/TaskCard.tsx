@@ -8,7 +8,7 @@ import { forwardRef, type HTMLAttributes } from 'react';
 import { TaskCheckbox } from '@/components/features/board/TaskCheckbox';
 import { LabelChip } from '@/components/features/board/LabelChip';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
-import { formatDueDate } from '@/lib/formatDueDate';
+import { formatDueDate, isOverdue } from '@/lib/formatDueDate';
 import { cn } from '@/lib/utils';
 import type { BoardLabel, BoardTask, BoardUser } from '@/types/board';
 
@@ -39,6 +39,8 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
       task.labelIds.includes(label.id)
     );
     const members = users.filter((user) => task.memberIds.includes(user.id));
+    const isTaskOverdue =
+      !task.isCompleted && !!task.dueDate && isOverdue(task.dueDate);
 
     return (
       <div
@@ -80,8 +82,14 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             <span className="font-mono text-[11px]">{task.identifier}</span>
             {task.dueDate && (
-              <span className="flex items-center gap-1">
+              <span
+                className={cn(
+                  'flex items-center gap-1',
+                  isTaskOverdue && 'font-medium text-destructive'
+                )}
+              >
                 <CalendarIcon className="size-3" />
+                {isTaskOverdue && 'Vencida · '}
                 {formatDueDate(task.dueDate)}
               </span>
             )}
