@@ -15,10 +15,15 @@ import type { BoardPanel } from '@/types/board';
 
 interface PanelHeaderProps {
   panel: BoardPanel;
+  dragHandleRef: (element: HTMLElement | null) => void;
   dragProps: HTMLAttributes<HTMLDivElement>;
 }
 
-export function PanelHeader({ panel, dragProps }: PanelHeaderProps) {
+export function PanelHeader({
+  panel,
+  dragHandleRef,
+  dragProps,
+}: PanelHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
   const [name, setName] = useState(panel.name);
@@ -42,6 +47,7 @@ export function PanelHeader({ panel, dragProps }: PanelHeaderProps) {
   return (
     <>
       <div
+        ref={dragHandleRef}
         className="flex cursor-grab touch-none items-center justify-between gap-1 px-2 pt-1"
         {...(isEditing ? {} : dragProps)}
       >
@@ -60,11 +66,15 @@ export function PanelHeader({ panel, dragProps }: PanelHeaderProps) {
             }}
           />
         ) : (
-          <h2
-            className="min-w-0 flex-1 cursor-text truncate text-sm font-semibold"
-            onClick={startEditing}
-          >
-            {panel.name}
+          <h2 className="min-w-0 flex-1 truncate text-sm font-semibold">
+            <button
+              type="button"
+              aria-label={`Renomear painel ${panel.name}`}
+              className="max-w-full cursor-text truncate rounded-md text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              onClick={startEditing}
+            >
+              {panel.name}
+            </button>
           </h2>
         )}
         <span className="text-xs text-muted-foreground">

@@ -5,6 +5,7 @@ import {
   type SetStateAction,
 } from 'react';
 import {
+  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
@@ -12,7 +13,7 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { arrayMove } from '@dnd-kit/sortable';
+import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { moveTask, reorderPanels } from '@/app/(app)/dashboard/actions';
 import { findPanelByTaskId, moveTaskToPanel } from '@/lib/boardMoves';
 import type { BoardPanel, BoardTask } from '@/types/board';
@@ -26,12 +27,16 @@ export function useBoardDrag(
 ) {
   const [activeTask, setActiveTask] = useState<BoardTask | null>(null);
   const [, startTransition] = useTransition();
+  const keyboardSensor = useSensor(KeyboardSensor, {
+    coordinateGetter: sortableKeyboardCoordinates,
+  });
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: isDisabled ? Infinity : DRAG_ACTIVATION_DISTANCE,
       },
-    })
+    }),
+    isDisabled ? null : keyboardSensor
   );
 
   function handleDragStart({ active }: DragStartEvent) {

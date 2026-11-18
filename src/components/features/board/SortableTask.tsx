@@ -42,6 +42,11 @@ export function SortableTask({
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' && !isDragging) return onOpen();
+        listeners?.onKeyDown?.(event);
+      }}
     />
   );
 }
