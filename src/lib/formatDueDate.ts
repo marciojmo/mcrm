@@ -5,3 +5,7 @@ export function formatDueDate(isoDate: string) {
     timeZone: 'UTC',
   });
 }
+
+export function isOverdue(isoDate: string) {
+  return isoDate < new Date().toISOString().slice(0, 10);
+}
