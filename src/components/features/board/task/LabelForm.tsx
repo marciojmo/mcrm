@@ -76,7 +76,7 @@ export function LabelForm({ label, onDone }: LabelFormProps) {
           />
         ))}
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <Button size="sm" disabled={isPending} onClick={save}>
           {label ? 'Salvar' : 'Criar'}
         </Button>

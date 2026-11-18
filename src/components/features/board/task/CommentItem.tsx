@@ -113,7 +113,7 @@ export function CommentItem({
           />
         )}
         {isOwn && !isEditing && (
-          <div className="flex gap-2 text-xs">
+          <div className="flex flex-wrap gap-2 text-xs">
             <Button
               size="xs"
               variant="ghost"
