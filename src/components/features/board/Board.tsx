@@ -17,6 +17,7 @@ import { TaskDialog } from '@/components/features/board/TaskDialog';
 import { TaskCard } from '@/components/features/board/TaskCard';
 import { AddTextForm } from '@/components/ui/AddTextForm';
 import { Button, buttonVariants } from '@/components/ui/Button';
+import { DRAG_ACCESSIBILITY } from '@/constants/dragAccessibility';
 import { useBoardDrag } from '@/hooks/useBoardDrag';
 import { filterBoardPanels } from '@/lib/filterBoardPanels';
 import type { BoardLabel, BoardPanel, BoardUser } from '@/types/board';
@@ -95,6 +96,7 @@ export function Board({
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
+      accessibility={DRAG_ACCESSIBILITY}
     >
       <div className="flex items-center justify-between gap-4 px-4 pt-4">
         <BoardBreadcrumb boardId={boardId} boardName={boardName} />

@@ -31,7 +31,7 @@ export function SortableTask({
     isDragging,
   } = useSortable({
     id: task.id,
-    data: { type: 'task' },
+    data: { type: 'task', name: task.title },
     disabled: { draggable: false, droppable: isPanelDragging },
   });
   const completion = useTaskCompletion(task.id, task.isCompleted);

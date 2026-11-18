@@ -34,7 +34,7 @@ export function PanelColumn({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: panel.id, data: { type: 'panel' } });
+  } = useSortable({ id: panel.id, data: { type: 'panel', name: panel.name } });
 
   return (
     <section
