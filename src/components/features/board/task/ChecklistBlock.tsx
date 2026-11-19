@@ -11,6 +11,7 @@ import { AddTextForm } from '@/components/ui/AddTextForm';
 import { Button } from '@/components/ui/Button';
 import { ConfirmDeleteButton } from '@/components/ui/ConfirmDeleteButton';
 import type { Checklist } from '@/types/task';
+import { DELETE_ERROR_MESSAGE } from '@/constants/errorMessages';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface ChecklistBlockProps {
@@ -25,11 +26,14 @@ export function ChecklistBlock({ checklist, onChange }: ChecklistBlockProps) {
     ? Math.round((doneCount / checklist.items.length) * 100)
     : 0;
 
-  function run(action: () => Promise<void>) {
-    runAction(async () => {
-      await action();
-      await onChange();
-    });
+  function run(action: () => Promise<void>, errorMessage?: string) {
+    runAction(
+      async () => {
+        await action();
+        await onChange();
+      },
+      { errorMessage }
+    );
   }
 
   return (
@@ -38,7 +42,9 @@ export function ChecklistBlock({ checklist, onChange }: ChecklistBlockProps) {
         <h3 className="text-sm font-semibold">{checklist.title}</h3>
         <ConfirmDeleteButton
           isPending={isPending}
-          onConfirm={() => run(() => deleteChecklist(checklist.id))}
+          onConfirm={() =>
+            run(() => deleteChecklist(checklist.id), DELETE_ERROR_MESSAGE)
+          }
         >
           <Trash2Icon /> Excluir
         </ConfirmDeleteButton>
@@ -72,7 +78,9 @@ export function ChecklistBlock({ checklist, onChange }: ChecklistBlockProps) {
               variant="ghost"
               size="icon-xs"
               aria-label="Remover item"
-              onClick={() => run(() => deleteChecklistItem(item.id))}
+              onClick={() =>
+                run(() => deleteChecklistItem(item.id), DELETE_ERROR_MESSAGE)
+              }
             >
               <XIcon />
             </Button>

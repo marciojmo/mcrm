@@ -8,6 +8,7 @@ import { ArchiveBoardDialog } from '@/components/features/board/ArchiveBoardDial
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Button } from '@/components/ui/Button';
 import type { BoardUser } from '@/types/board';
+import { REMOVE_ERROR_MESSAGE } from '@/constants/errorMessages';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface BoardSettingsProps {
@@ -31,7 +32,9 @@ export function BoardSettings({
   const { isPending, runAction } = useSafeTransition();
 
   function remove(userId: string) {
-    runAction(() => removeBoardMember(boardId, userId));
+    runAction(() => removeBoardMember(boardId, userId), {
+      errorMessage: REMOVE_ERROR_MESSAGE,
+    });
   }
 
   return (

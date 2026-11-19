@@ -13,6 +13,7 @@ import { ConfirmDeleteButton } from '@/components/ui/ConfirmDeleteButton';
 import { cn } from '@/lib/utils';
 import type { BoardUser } from '@/types/board';
 import type { TaskComment, TaskReference } from '@/types/task';
+import { DELETE_ERROR_MESSAGE } from '@/constants/errorMessages';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface CommentItemProps {
@@ -44,12 +45,19 @@ export function CommentItem({
   const { isPending, runAction } = useSafeTransition();
   const isOwn = comment.author.id === currentUserId;
 
-  function run(action: () => Promise<void>, onDone?: () => void) {
-    runAction(async () => {
-      await action();
-      await onChange();
-      onDone?.();
-    });
+  function run(
+    action: () => Promise<void>,
+    onDone?: () => void,
+    errorMessage?: string
+  ) {
+    runAction(
+      async () => {
+        await action();
+        await onChange();
+        onDone?.();
+      },
+      { errorMessage }
+    );
   }
 
   return (
@@ -124,7 +132,13 @@ export function CommentItem({
             </Button>
             <ConfirmDeleteButton
               isPending={isPending}
-              onConfirm={() => run(() => deleteComment(comment.id))}
+              onConfirm={() =>
+                run(
+                  () => deleteComment(comment.id),
+                  undefined,
+                  DELETE_ERROR_MESSAGE
+                )
+              }
             >
               Excluir
             </ConfirmDeleteButton>

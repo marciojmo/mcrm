@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/Dialog';
 import type { BoardPanel } from '@/types/board';
+import { ARCHIVE_ERROR_MESSAGE } from '@/constants/errorMessages';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface ArchivePanelDialogProps {
@@ -28,10 +29,13 @@ export function ArchivePanelDialog({
   const taskCount = panel.tasks.length;
 
   function confirm() {
-    runAction(async () => {
-      await archivePanel(panel.id);
-      onOpenChange(false);
-    });
+    runAction(
+      async () => {
+        await archivePanel(panel.id);
+        onOpenChange(false);
+      },
+      { errorMessage: ARCHIVE_ERROR_MESSAGE }
+    );
   }
 
   return (

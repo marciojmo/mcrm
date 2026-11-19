@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { ARCHIVE_ERROR_MESSAGE } from '@/constants/errorMessages';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface ArchiveBoardDialogProps {
@@ -44,7 +45,11 @@ export function ArchiveBoardDialog({
           <Button
             variant="destructive"
             disabled={isPending}
-            onClick={() => runAction(() => archiveBoard(boardId))}
+            onClick={() =>
+              runAction(() => archiveBoard(boardId), {
+                errorMessage: ARCHIVE_ERROR_MESSAGE,
+              })
+            }
           >
             Arquivar quadro
           </Button>
