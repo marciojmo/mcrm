@@ -42,9 +42,10 @@ export function ConfirmDeleteButton({
         variant="destructive"
         size={size}
         disabled={isPending}
+        aria-busy={isPending}
         onClick={onConfirm}
       >
-        Confirmar exclusão
+        {isPending ? 'Excluindo…' : 'Confirmar exclusão'}
       </Button>
       <Button
         variant="ghost"

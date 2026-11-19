@@ -45,13 +45,14 @@ export function ArchiveBoardDialog({
           <Button
             variant="destructive"
             disabled={isPending}
+            aria-busy={isPending}
             onClick={() =>
               runAction(() => archiveBoard(boardId), {
                 errorMessage: ARCHIVE_ERROR_MESSAGE,
               })
             }
           >
-            Arquivar quadro
+            {isPending ? 'Arquivando…' : 'Arquivar quadro'}
           </Button>
         </DialogFooter>
       </DialogContent>

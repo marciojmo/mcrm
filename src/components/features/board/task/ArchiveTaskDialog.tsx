@@ -51,8 +51,8 @@ export function ArchiveTaskDialog({
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button disabled={isPending} onClick={confirm}>
-            Arquivar
+          <Button disabled={isPending} aria-busy={isPending} onClick={confirm}>
+            {isPending ? 'Arquivando…' : 'Arquivar'}
           </Button>
         </DialogFooter>
       </DialogContent>
