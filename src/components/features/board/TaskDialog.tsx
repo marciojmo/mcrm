@@ -17,6 +17,7 @@ import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { MAX_DESCRIPTION_LENGTH } from '@/constants/task';
 import { useTaskCompletion } from '@/hooks/useTaskCompletion';
 import { useTaskDraft } from '@/hooks/useTaskDraft';
@@ -102,7 +103,9 @@ export function TaskDialog({
               {members.length > 0 && (
                 <div className="flex items-center gap-1" aria-label="Membros">
                   {members.map((user) => (
-                    <UserAvatar key={user.id} user={user} />
+                    <Tooltip key={user.id} content={user.name}>
+                      <UserAvatar user={user} title={undefined} />
+                    </Tooltip>
                   ))}
                 </div>
               )}
