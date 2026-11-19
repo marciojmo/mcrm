@@ -57,7 +57,7 @@ export function PanelHeader({
     <>
       <div
         ref={dragHandleRef}
-        className="flex cursor-grab touch-none items-center justify-between gap-1 rounded-md px-2 pt-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="flex cursor-grab items-center justify-between gap-1 rounded-md px-2 pt-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         {...(isEditing ? {} : dragProps)}
       >
         {isEditing ? (

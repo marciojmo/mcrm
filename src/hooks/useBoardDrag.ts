@@ -1,7 +1,8 @@
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import {
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -15,6 +16,8 @@ import { findPanelByTaskId, moveTaskToPanel } from '@/lib/boardMoves';
 import type { BoardPanel, BoardTask } from '@/types/board';
 
 const DRAG_ACTIVATION_DISTANCE = 5;
+const TOUCH_ACTIVATION_DELAY = 200;
+const TOUCH_ACTIVATION_TOLERANCE = 5;
 
 interface DragOrigin {
   id: string;
@@ -69,10 +72,18 @@ export function useBoardDrag(
     coordinateGetter: sortableKeyboardCoordinates,
   });
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
         distance: isDisabled ? Infinity : DRAG_ACTIVATION_DISTANCE,
       },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: isDisabled
+        ? { distance: Infinity }
+        : {
+            delay: TOUCH_ACTIVATION_DELAY,
+            tolerance: TOUCH_ACTIVATION_TOLERANCE,
+          },
     }),
     isDisabled ? null : keyboardSensor
   );

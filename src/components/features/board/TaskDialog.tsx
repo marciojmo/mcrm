@@ -54,9 +54,9 @@ export function TaskDialog({
 
   return (
     <Dialog open onOpenChange={(isOpen) => !isOpen && close()}>
-      <DialogContent className="flex h-[80vh] w-[80vw] max-w-none gap-0 p-0 sm:max-w-none">
+      <DialogContent className="flex h-[90vh] w-[95vw] max-w-none flex-col gap-0 overflow-y-auto p-0 sm:max-w-none md:h-[80vh] md:w-[80vw] md:flex-row md:overflow-visible">
         <DialogTitle className="sr-only">Detalhes da tarefa</DialogTitle>
-        <div className="flex min-h-0 w-[65%] flex-col gap-4 p-4">
+        <div className="flex shrink-0 flex-col gap-4 p-4 md:min-h-0 md:w-[65%]">
           <span className="-mb-3 flex gap-2 font-mono text-xs text-muted-foreground">
             {task.identifier}
             <span aria-live="polite">{isPending ? 'Salvando…' : ''}</span>
@@ -152,7 +152,7 @@ export function TaskDialog({
             />
           </div>
         </div>
-        <aside className="flex min-h-0 w-[35%] flex-col border-l bg-muted/30 p-4">
+        <aside className="flex shrink-0 flex-col border-t bg-muted/30 p-4 md:min-h-0 md:w-[35%] md:border-t-0 md:border-l">
           <CommentsSection
             taskId={task.id}
             users={users}
