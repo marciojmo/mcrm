@@ -42,6 +42,10 @@ export function assertTaskAccess(userId: string, taskId: string) {
   return assertVisibleBoard(userId, withTask({ id: taskId }));
 }
 
+export function assertLabelAccess(userId: string, labelId: string) {
+  return assertVisibleBoard(userId, { labels: { some: { id: labelId } } });
+}
+
 export function assertChecklistAccess(userId: string, checklistId: string) {
   return assertVisibleBoard(
     userId,

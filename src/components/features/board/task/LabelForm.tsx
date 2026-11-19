@@ -18,11 +18,12 @@ import { DELETE_ERROR_MESSAGE } from '@/constants/errorMessages';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface LabelFormProps {
+  boardId: string;
   label: BoardLabel | null;
   onDone: () => void;
 }
 
-export function LabelForm({ label, onDone }: LabelFormProps) {
+export function LabelForm({ boardId, label, onDone }: LabelFormProps) {
   const [name, setName] = useState(label?.name ?? '');
   const [color, setColor] = useState(label?.color ?? LABEL_COLORS[0]);
   const { isPending, runAction } = useSafeTransition();
@@ -39,7 +40,9 @@ export function LabelForm({ label, onDone }: LabelFormProps) {
 
   function save() {
     run(() =>
-      label ? updateLabel(label.id, name, color) : createLabel(name, color)
+      label
+        ? updateLabel(label.id, name, color)
+        : createLabel(boardId, name, color)
     );
   }
 

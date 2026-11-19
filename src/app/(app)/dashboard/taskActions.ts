@@ -27,9 +27,11 @@ import {
 import { toggleTaskMember as toggleTaskMemberRecord } from '@/services/memberService';
 import {
   assertAttachmentAccess,
+  assertBoardAccess,
   assertChecklistAccess,
   assertCommentAccess,
   assertChecklistItemAccess,
+  assertLabelAccess,
   assertTaskAccess,
 } from '@/services/boardService';
 import { requireSession } from '@/services/sessionService';
@@ -68,9 +70,15 @@ export async function getTaskExtras(taskId: string) {
   return getTaskExtrasRecord(taskId, user.id);
 }
 
-export async function createLabel(name: string, color: string) {
-  await requireSession();
+export async function createLabel(
+  boardId: string,
+  name: string,
+  color: string
+) {
+  const { user } = await requireSession();
+  await assertBoardAccess(user.id, boardId);
   await createLabelRecord(
+    boardId,
     name.trim().slice(0, MAX_NAME_LENGTH),
     cleanColor(color)
   );
@@ -78,7 +86,8 @@ export async function createLabel(name: string, color: string) {
 }
 
 export async function updateLabel(id: string, name: string, color: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertLabelAccess(user.id, id);
   await updateLabelRecord(
     id,
     name.trim().slice(0, MAX_NAME_LENGTH),
@@ -88,7 +97,8 @@ export async function updateLabel(id: string, name: string, color: string) {
 }
 
 export async function deleteLabel(id: string) {
-  await requireSession();
+  const { user } = await requireSession();
+  await assertLabelAccess(user.id, id);
   await deleteLabelRecord(id);
   await refresh();
 }

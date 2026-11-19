@@ -22,7 +22,7 @@ async function BoardView({
   const [panels, users, labels] = await Promise.all([
     listPanels(boardId),
     listBoardMembers(boardId),
-    listLabels(),
+    listLabels(boardId),
   ]);
   return (
     <Board

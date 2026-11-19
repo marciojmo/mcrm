@@ -17,11 +17,12 @@ import { useSafeTransition } from '@/hooks/useSafeTransition';
 import type { BoardLabel, BoardTask } from '@/types/board';
 
 interface LabelsPopoverProps {
+  boardId: string;
   task: BoardTask;
   labels: BoardLabel[];
 }
 
-export function LabelsPopover({ task, labels }: LabelsPopoverProps) {
+export function LabelsPopover({ boardId, task, labels }: LabelsPopoverProps) {
   const [query, setQuery] = useState('');
   const [editing, setEditing] = useState<BoardLabel | 'new' | null>(null);
   const { runAction } = useSafeTransition();
@@ -41,6 +42,7 @@ export function LabelsPopover({ task, labels }: LabelsPopoverProps) {
       <PopoverContent align="start" className="w-72">
         {editing ? (
           <LabelForm
+            boardId={boardId}
             label={editing === 'new' ? null : editing}
             onDone={() => setEditing(null)}
           />

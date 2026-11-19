@@ -171,6 +171,7 @@ export function Board({
       {openTask && (
         <TaskDialog
           key={openTask.id}
+          boardId={boardId}
           task={openTask}
           users={users}
           labels={labels}
