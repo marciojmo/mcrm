@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { MarkMentionSeenButton } from '@/components/features/home/MarkMentionSeenButton';
+import { MentionLink } from '@/components/features/home/MentionLink';
 import { cn } from '@/lib/utils';
 import type { HomeMention } from '@/types/home';
 
@@ -22,7 +22,9 @@ export function NotificationList({ mentions }: { mentions: HomeMention[] }) {
             mention.isSeen && 'opacity-60'
           )}
         >
-          <Link
+          <MentionLink
+            commentId={mention.id}
+            isSeen={mention.isSeen}
             href={`/dashboard?task=${mention.taskId}&comment=${mention.id}`}
             className="flex min-w-0 flex-1 gap-3 rounded-lg p-3 text-sm hover:bg-muted"
           >
@@ -49,7 +51,7 @@ export function NotificationList({ mentions }: { mentions: HomeMention[] }) {
                 {new Date(mention.createdAt).toLocaleString('pt-BR')}
               </span>
             </span>
-          </Link>
+          </MentionLink>
           {!mention.isSeen && <MarkMentionSeenButton commentId={mention.id} />}
         </li>
       ))}
