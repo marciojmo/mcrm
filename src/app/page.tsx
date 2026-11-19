@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/Card';
 import { env } from '@/config/env';
+import { getAppName } from '@/services/appSettingService';
 import { getSession } from '@/services/sessionService';
 
 async function SignInError({
@@ -25,6 +26,10 @@ async function SignInError({
   );
 }
 
+async function AppName() {
+  return getAppName();
+}
+
 async function RedirectIfSignedIn() {
   if (await getSession()) redirect('/dashboard');
   return null;
@@ -35,7 +40,11 @@ export default function Home({ searchParams }: PageProps<'/'>) {
     <main className="flex flex-1 items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-xl">MCRM</CardTitle>
+          <CardTitle className="text-xl">
+            <Suspense>
+              <AppName />
+            </Suspense>
+          </CardTitle>
           <CardDescription>
             Entre ou crie sua conta com o Google Workspace da instituição (@
             {env.GOOGLE_WORKSPACE_DOMAIN}).

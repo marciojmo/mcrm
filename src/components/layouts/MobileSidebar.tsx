@@ -13,11 +13,16 @@ import { SidebarNav } from '@/components/layouts/Sidebar';
 import type { BoardSummary } from '@/types/board';
 
 interface MobileSidebarProps {
+  appName: string;
   boards: BoardSummary[];
   isAdmin?: boolean;
 }
 
-export function MobileSidebar({ boards, isAdmin = false }: MobileSidebarProps) {
+export function MobileSidebar({
+  appName,
+  boards,
+  isAdmin = false,
+}: MobileSidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -40,6 +45,7 @@ export function MobileSidebar({ boards, isAdmin = false }: MobileSidebarProps) {
       >
         <DialogTitle className="sr-only">Menu</DialogTitle>
         <SidebarNav
+          appName={appName}
           boards={boards}
           isAdmin={isAdmin}
           onNavigate={() => setIsOpen(false)}

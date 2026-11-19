@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { UserMenu } from '@/components/features/auth/UserMenu';
 import { MobileSidebar } from '@/components/layouts/MobileSidebar';
 import { Sidebar } from '@/components/layouts/Sidebar';
+import { getAppName } from '@/services/appSettingService';
 import { listBoards } from '@/services/boardService';
 import { isAdminEmail, requireSession } from '@/services/sessionService';
 
@@ -13,6 +14,7 @@ async function AppSidebar() {
   const { user } = await requireSession();
   return (
     <Sidebar
+      appName={await getAppName()}
       boards={await listBoards(user.id)}
       isAdmin={isAdminEmail(user.email)}
     />
@@ -24,6 +26,7 @@ async function AppHeader() {
   return (
     <>
       <MobileSidebar
+        appName={await getAppName()}
         boards={await listBoards(user.id)}
         isAdmin={isAdminEmail(user.email)}
       />

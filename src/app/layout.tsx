@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist_Mono, Inter } from 'next/font/google';
+import { getAppName } from '@/services/appSettingService';
 import { ToastProvider } from '@/components/ui/Toast';
 import './globals.css';
 
@@ -13,10 +14,12 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-export const metadata: Metadata = {
-  title: 'MCRM',
-  description: 'Painéis e tarefas integrados ao Google Workspace',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: await getAppName(),
+    description: 'Painéis e tarefas integrados ao Google Workspace',
+  };
+}
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
