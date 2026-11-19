@@ -63,17 +63,17 @@ export function useTaskDraft(task: BoardTask, onClose: () => void) {
       toast.add({ title: SAVE_ERROR_MESSAGE, priority: 'high' });
   }
 
-  async function close() {
+  async function close(proceed: () => void = onClose) {
     if (isClosing.current) return;
     const { key } = getDraft({});
     if (key === failedCloseKey.current) {
       isDiscarded.current = true;
-      return onClose();
+      return proceed();
     }
     isClosing.current = true;
     const isSaved = await save({});
     isClosing.current = false;
-    if (isSaved) return onClose();
+    if (isSaved) return proceed();
     failedCloseKey.current = key;
     toast.add({ title: DISCARD_WARNING, priority: 'high' });
   }

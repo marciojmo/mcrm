@@ -161,7 +161,7 @@ export function TaskDialog({
             comments={extras?.comments ?? []}
             taskReferences={extras?.taskReferences ?? []}
             onChange={reload}
-            onOpenTask={onOpenTask}
+            onOpenTask={(reference) => close(() => onOpenTask(reference))}
           />
         </aside>
         <TaskMenu
