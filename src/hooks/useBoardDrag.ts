@@ -97,7 +97,6 @@ export function useBoardDrag(
       index: panel?.tasks.findIndex((task) => task.id === id) ?? -1,
     };
     setActiveTask(panel?.tasks.find((task) => task.id === id) ?? null);
-    setActiveTask(panel?.tasks.find((task) => task.id === active.id) ?? null);
   }
 
   function handleDragOver({ active, over }: DragOverEvent) {
