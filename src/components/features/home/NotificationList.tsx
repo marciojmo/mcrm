@@ -29,6 +29,15 @@ export function NotificationList({ mentions }: { mentions: HomeMention[] }) {
             <UserAvatar user={mention.author} />
             <span className="flex min-w-0 flex-col gap-0.5">
               <span>
+                {!mention.isSeen && (
+                  <>
+                    <span
+                      aria-hidden="true"
+                      className="mr-1.5 inline-block size-2 rounded-full bg-primary align-middle"
+                    />
+                    <span className="sr-only">Não vista: </span>
+                  </>
+                )}
                 <span className="font-medium">{mention.author.name}</span>{' '}
                 mencionou você em{' '}
                 <span className="font-medium">{mention.taskTitle}</span>
