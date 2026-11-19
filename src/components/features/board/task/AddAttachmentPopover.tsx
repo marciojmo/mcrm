@@ -57,8 +57,8 @@ export function AddAttachmentPopover({
       });
       if (!response.ok) return setError('Não foi possível enviar o arquivo.');
       router.refresh();
-      await onChange();
       finish();
+      await onChange();
     });
   }
 
@@ -71,8 +71,8 @@ export function AddAttachmentPopover({
     setError('');
     runAction(async () => {
       await addLinkAttachment(taskId, url, name);
-      await onChange();
       finish();
+      await onChange();
     });
   }
 
