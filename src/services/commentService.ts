@@ -11,14 +11,21 @@ export async function addComment(
       taskId,
       authorId,
       body,
-      mentionedUserIds: await filterExistingUserIds(mentionedUserIds),
+      mentionedUserIds: await filterBoardUserIds(taskId, mentionedUserIds),
     },
   });
 }
 
-async function filterExistingUserIds(userIds: string[]) {
+async function filterBoardUserIds(taskId: string, userIds: string[]) {
+  const board = { panels: { some: { tasks: { some: { id: taskId } } } } };
   const users = await prisma.user.findMany({
-    where: { id: { in: userIds } },
+    where: {
+      id: { in: userIds },
+      OR: [
+        { boards: { some: board } },
+        { boardMemberships: { some: { board } } },
+      ],
+    },
     select: { id: true },
   });
   return users.map((user) => user.id);
@@ -30,14 +37,21 @@ export async function updateComment(
   body: string,
   mentionedUserIds: string[]
 ) {
-  const { count } = await prisma.comment.updateMany({
+  const comment = await prisma.comment.findFirst({
     where: { id: commentId, authorId },
+    select: { taskId: true },
+  });
+  if (!comment) throw new Error('Comment not found');
+  await prisma.comment.update({
+    where: { id: commentId },
     data: {
       body,
-      mentionedUserIds: await filterExistingUserIds(mentionedUserIds),
+      mentionedUserIds: await filterBoardUserIds(
+        comment.taskId,
+        mentionedUserIds
+      ),
     },
   });
-  if (count === 0) throw new Error('Comment not found');
 }
 
 export async function markMentionSeen(commentId: string, userId: string) {

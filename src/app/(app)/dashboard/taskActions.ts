@@ -28,6 +28,7 @@ import { toggleTaskMember as toggleTaskMemberRecord } from '@/services/memberSer
 import {
   assertAttachmentAccess,
   assertChecklistAccess,
+  assertCommentAccess,
   assertChecklistItemAccess,
   assertTaskAccess,
 } from '@/services/boardService';
@@ -166,6 +167,7 @@ export async function updateComment(
   mentionedUserIds: string[]
 ) {
   const { user } = await requireSession();
+  await assertCommentAccess(user.id, commentId);
   await updateCommentRecord(
     commentId,
     user.id,
@@ -177,6 +179,7 @@ export async function updateComment(
 
 export async function deleteComment(commentId: string) {
   const { user } = await requireSession();
+  await assertCommentAccess(user.id, commentId);
   await deleteCommentRecord(commentId, user.id);
   await refresh();
 }
