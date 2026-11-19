@@ -71,6 +71,7 @@ export async function createPanel(boardId: string, name: string) {
 
 export async function reorderPanels(panelIds: string[]) {
   await prisma.$transaction(async (tx) => {
+    if (panelIds.length === 0) throw new Error('Invalid panel order');
     const [first] = panelIds;
     const { boardId } = await tx.panel.findUniqueOrThrow({
       where: { id: first },
