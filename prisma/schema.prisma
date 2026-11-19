@@ -233,3 +233,11 @@ model Attachment {
   @@index([taskId])
   @@map("attachments")
 }
+
+model AppSetting {
+  id        String   @id @default("app")
+  appName   String   @default("MCRM") @map("app_name") @db.VarChar(40)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}
