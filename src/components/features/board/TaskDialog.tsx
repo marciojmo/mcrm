@@ -25,6 +25,7 @@ import type { BoardLabel, BoardTask, BoardUser } from '@/types/board';
 import type { TaskReference } from '@/types/task';
 
 interface TaskDialogProps {
+  boardId: string;
   task: BoardTask;
   users: BoardUser[];
   labels: BoardLabel[];
@@ -35,6 +36,7 @@ interface TaskDialogProps {
 }
 
 export function TaskDialog({
+  boardId,
   task,
   users,
   labels,
@@ -78,7 +80,7 @@ export function TaskDialog({
             />
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <LabelsPopover task={task} labels={labels} />
+            <LabelsPopover boardId={boardId} task={task} labels={labels} />
             <MembersPopover task={task} users={users} />
             <AddChecklistPopover
               taskId={task.id}

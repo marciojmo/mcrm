@@ -84,6 +84,7 @@ model Board {
   owner          User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   members        BoardMember[]
   panels         Panel[]
+  labels         Label[]
 
   @@index([ownerId])
   @@map("boards")
@@ -140,9 +141,12 @@ model Label {
   id        String      @id @default(cuid())
   name      String
   color     String
+  boardId   String      @map("board_id")
   createdAt DateTime    @default(now()) @map("created_at")
+  board     Board       @relation(fields: [boardId], references: [id], onDelete: Cascade)
   tasks     TaskLabel[]
 
+  @@index([boardId])
   @@map("labels")
 }
 
