@@ -16,6 +16,45 @@ import type { BoardPanel, BoardTask } from '@/types/board';
 
 const DRAG_ACTIVATION_DISTANCE = 5;
 
+interface DragOrigin {
+  id: string;
+  type: 'task' | 'panel';
+  panelId: string;
+  index: number;
+}
+
+function insertAt<T>(items: T[], index: number, item: T) {
+  const copy = [...items];
+  copy.splice(index, 0, item);
+  return copy;
+}
+
+function restoreOrigin(panels: BoardPanel[], origin: DragOrigin) {
+  if (origin.type === 'panel') {
+    const panel = panels.find((item) => item.id === origin.id);
+    if (!panel) return panels;
+    const others = panels.filter((item) => item.id !== origin.id);
+    return insertAt(others, origin.index, panel);
+  }
+  const holder = findPanelByTaskId(panels, origin.id);
+  const task = holder?.tasks.find((item) => item.id === origin.id);
+  if (!task || holder?.id === origin.panelId) return panels;
+  if (!panels.some((panel) => panel.id === origin.panelId)) {
+    return panels;
+  }
+  return panels
+    .map((panel) =>
+      panel.id === holder?.id
+        ? { ...panel, tasks: panel.tasks.filter((item) => item !== task) }
+        : panel
+    )
+    .map((panel) =>
+      panel.id === origin.panelId
+        ? { ...panel, tasks: insertAt(panel.tasks, origin.index, task) }
+        : panel
+    );
+}
+
 export function useBoardDrag(
   panels: BoardPanel[],
   setPanels: Dispatch<SetStateAction<BoardPanel[]>>,
@@ -23,7 +62,7 @@ export function useBoardDrag(
 ) {
   const [activeTask, setActiveTask] = useState<BoardTask | null>(null);
   const savedPanels = useRef(panels);
-  const dragStartPanels = useRef(panels);
+  const dragOrigin = useRef<DragOrigin | null>(null);
   const pendingMoveCount = useRef(0);
   const { runAction } = useSafeTransition();
   const keyboardSensor = useSensor(KeyboardSensor, {
@@ -40,10 +79,24 @@ export function useBoardDrag(
 
   function handleDragStart({ active }: DragStartEvent) {
     if (pendingMoveCount.current === 0) savedPanels.current = panels;
-    dragStartPanels.current = panels;
-    if (active.data.current?.type !== 'task') return;
-    const panel = findPanelByTaskId(panels, String(active.id));
-    setActiveTask(panel?.tasks.find((task) => task.id === active.id) ?? null);
+    const id = String(active.id);
+    if (active.data.current?.type !== 'task') {
+      dragOrigin.current = {
+        id,
+        type: 'panel',
+        panelId: id,
+        index: panels.findIndex((item) => item.id === id),
+      };
+      return;
+    }
+    const panel = findPanelByTaskId(panels, id);
+    dragOrigin.current = {
+      id,
+      type: 'task',
+      panelId: panel?.id ?? '',
+      index: panel?.tasks.findIndex((task) => task.id === id) ?? -1,
+    };
+    setActiveTask(panel?.tasks.find((task) => task.id === id) ?? null);
   }
 
   function handleDragOver({ active, over }: DragOverEvent) {
@@ -86,7 +139,8 @@ export function useBoardDrag(
 
   function handleDragCancel() {
     setActiveTask(null);
-    setPanels(dragStartPanels.current);
+    const origin = dragOrigin.current;
+    if (origin) setPanels((current) => restoreOrigin(current, origin));
   }
 
   async function saveMove(action: () => Promise<unknown>) {
