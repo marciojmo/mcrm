@@ -55,7 +55,7 @@ export function MembersPopover({ task, users }: MembersPopoverProps) {
                     runAction(() => toggleTaskMember(task.id, user.id))
                   }
                 >
-                  <UserAvatar user={user} />
+                  <UserAvatar user={user} isDecorative />
                   <span className="flex-1 truncate">{user.name}</span>
                   {task.memberIds.includes(user.id) && (
                     <CheckIcon className="size-4" />

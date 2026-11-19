@@ -44,7 +44,7 @@ export function BoardSettings({
         <ul className="flex flex-col gap-2">
           {members.map((member) => (
             <li key={member.id} className="flex items-center gap-2 text-sm">
-              <UserAvatar user={member} />
+              <UserAvatar user={member} isDecorative />
               <span className="flex-1">
                 {member.name}
                 {member.id === ownerId && (
