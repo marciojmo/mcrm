@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { formatTaskIdentifier } from '@/lib/taskIdentifier';
+import { lockBoard } from '@/services/rowLocks';
 import type { BoardPanel } from '@/types/board';
 
 export async function listPanels(boardId: string): Promise<BoardPanel[]> {
@@ -57,16 +58,40 @@ export async function listPanels(boardId: string): Promise<BoardPanel[]> {
 }
 
 export async function createPanel(boardId: string, name: string) {
-  const position = await prisma.panel.count({ where: { boardId } });
-  return prisma.panel.create({ data: { boardId, name, position } });
+  return prisma.$transaction(async (tx) => {
+    await lockBoard(tx, boardId);
+    const { _max } = await tx.panel.aggregate({
+      where: { boardId, archivedAt: null },
+      _max: { position: true },
+    });
+    const position = (_max.position ?? -1) + 1;
+    return tx.panel.create({ data: { boardId, name, position } });
+  });
 }
 
 export async function reorderPanels(panelIds: string[]) {
-  await prisma.$transaction(
-    panelIds.map((id, position) =>
-      prisma.panel.update({ where: { id }, data: { position } })
-    )
-  );
+  await prisma.$transaction(async (tx) => {
+    if (panelIds.length === 0) throw new Error('Invalid panel order');
+    const [first] = panelIds;
+    const { boardId } = await tx.panel.findUniqueOrThrow({
+      where: { id: first },
+      select: { boardId: true },
+    });
+    await lockBoard(tx, boardId);
+    const current = await tx.panel.findMany({
+      where: { boardId, archivedAt: null },
+      select: { id: true },
+    });
+    const currentIds = new Set(current.map(({ id }) => id));
+    const isComplete =
+      new Set(panelIds).size === panelIds.length &&
+      panelIds.length === currentIds.size &&
+      panelIds.every((id) => currentIds.has(id));
+    if (!isComplete) throw new Error('Invalid panel order');
+    for (const [position, id] of panelIds.entries()) {
+      await tx.panel.update({ where: { id }, data: { position } });
+    }
+  });
 }
 
 export async function renamePanel(panelId: string, name: string) {
