@@ -30,7 +30,7 @@ export function LabelChip({
         <button
           type="button"
           aria-label={`Remover etiqueta ${label.name || label.color}`}
-          className="shrink-0 rounded hover:bg-black/15"
+          className="shrink-0 rounded outline-none hover:bg-black/15 focus-visible:ring-3 focus-visible:ring-ring/50"
           onClick={(event) => {
             event.stopPropagation();
             onRemove();
