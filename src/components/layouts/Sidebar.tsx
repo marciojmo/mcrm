@@ -22,22 +22,28 @@ export const NAV_ITEM_CLASS =
 export const NAV_ACTIVE_CLASS =
   'bg-sidebar-accent font-medium text-sidebar-accent-foreground hover:bg-sidebar-accent';
 
-interface SidebarProps {
+interface SidebarNavProps {
   boards: BoardSummary[];
   isAdmin?: boolean;
+  onNavigate?: () => void;
 }
 
-export function Sidebar({ boards, isAdmin = false }: SidebarProps) {
+export function SidebarNav({
+  boards,
+  isAdmin = false,
+  onNavigate,
+}: SidebarNavProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-56 shrink-0 flex-col gap-4 border-r bg-sidebar p-3">
+    <>
       <span className="px-2 py-1 font-semibold">MCRM</span>
       <nav className="flex flex-1 flex-col gap-1">
         {NAV_ITEMS.map(({ href, label, Icon }) => (
           <div key={href} className="flex flex-col gap-1">
             <Link
               href={href}
+              onClick={onNavigate}
               aria-current={pathname.startsWith(href) ? 'page' : undefined}
               className={cn(
                 NAV_ITEM_CLASS,
@@ -53,6 +59,7 @@ export function Sidebar({ boards, isAdmin = false }: SidebarProps) {
                   <Link
                     key={board.id}
                     href={`/dashboard/${board.id}`}
+                    onClick={onNavigate}
                     aria-current={
                       pathname === `/dashboard/${board.id}` ? 'page' : undefined
                     }
@@ -71,11 +78,19 @@ export function Sidebar({ boards, isAdmin = false }: SidebarProps) {
         ))}
       </nav>
       {isAdmin && (
-        <Link href="/admin" className={NAV_ITEM_CLASS}>
+        <Link href="/admin" className={NAV_ITEM_CLASS} onClick={onNavigate}>
           <ShieldIcon className="size-4" />
           God mode
         </Link>
       )}
+    </>
+  );
+}
+
+export function Sidebar({ boards, isAdmin = false }: SidebarNavProps) {
+  return (
+    <aside className="hidden w-56 shrink-0 flex-col gap-4 border-r bg-sidebar p-3 md:flex">
+      <SidebarNav boards={boards} isAdmin={isAdmin} />
     </aside>
   );
 }

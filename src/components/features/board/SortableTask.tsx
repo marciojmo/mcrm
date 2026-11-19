@@ -46,7 +46,7 @@ export function SortableTask({
       labels={labels}
       isGhost={isDragging}
       onClick={onOpen}
-      className="cursor-grab touch-none outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      className="cursor-grab outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
