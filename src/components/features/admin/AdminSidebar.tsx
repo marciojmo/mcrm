@@ -49,7 +49,7 @@ export function AdminSidebar({ collaborators }: AdminSidebarProps) {
                   pathname === href && NAV_ACTIVE_CLASS
                 )}
               >
-                <UserAvatar user={collaborator} />
+                <UserAvatar user={collaborator} isDecorative />
                 <span className="truncate">{collaborator.name}</span>
               </Link>
             );

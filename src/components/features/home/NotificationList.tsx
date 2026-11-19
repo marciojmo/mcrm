@@ -26,7 +26,7 @@ export function NotificationList({ mentions }: { mentions: HomeMention[] }) {
             href={`/dashboard?task=${mention.taskId}&comment=${mention.id}`}
             className="flex min-w-0 flex-1 gap-3 rounded-lg p-3 text-sm hover:bg-muted"
           >
-            <UserAvatar user={mention.author} />
+            <UserAvatar user={mention.author} isDecorative />
             <span className="flex min-w-0 flex-col gap-0.5">
               <span>
                 {!mention.isSeen && (

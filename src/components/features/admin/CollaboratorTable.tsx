@@ -44,7 +44,7 @@ export function CollaboratorTable({ collaborators }: CollaboratorTableProps) {
                   href={`/admin/users/${collaborator.id}`}
                   className="flex items-center gap-2"
                 >
-                  <UserAvatar user={collaborator} />
+                  <UserAvatar user={collaborator} isDecorative />
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate font-medium">
                       {collaborator.name}

@@ -68,7 +68,7 @@ export function CommentItem({
         isHighlighted && 'animate-comment-highlight'
       )}
     >
-      <UserAvatar user={comment.author} />
+      <UserAvatar user={comment.author} isDecorative />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="font-medium">
           {comment.author.name}{' '}

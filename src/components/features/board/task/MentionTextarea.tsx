@@ -121,7 +121,7 @@ export function MentionTextarea({
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => mention(user)}
             >
-              <UserAvatar user={user} />
+              <UserAvatar user={user} isDecorative />
               {user.name}
             </li>
           ))}
