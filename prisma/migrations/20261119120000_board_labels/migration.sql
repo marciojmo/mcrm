@@ -3,12 +3,13 @@ ALTER TABLE "labels" ADD COLUMN "board_id" TEXT;
 
 -- Copy each label used in tasks to every board that uses it
 CREATE TEMPORARY TABLE "label_board_map" AS
-SELECT DISTINCT "task_labels"."label_id" AS "old_id",
-    "panels"."board_id" AS "board_id",
-    gen_random_uuid()::TEXT AS "new_id"
-FROM "task_labels"
-JOIN "tasks" ON "tasks"."id" = "task_labels"."task_id"
-JOIN "panels" ON "panels"."id" = "tasks"."panel_id";
+SELECT "pairs"."old_id", "pairs"."board_id", gen_random_uuid()::TEXT AS "new_id"
+FROM (
+    SELECT DISTINCT "task_labels"."label_id" AS "old_id", "panels"."board_id" AS "board_id"
+    FROM "task_labels"
+    JOIN "tasks" ON "tasks"."id" = "task_labels"."task_id"
+    JOIN "panels" ON "panels"."id" = "tasks"."panel_id"
+) AS "pairs";
 
 INSERT INTO "labels" ("id", "name", "color", "created_at", "board_id")
 SELECT "map"."new_id", "labels"."name", "labels"."color", "labels"."created_at", "map"."board_id"
