@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { PlusIcon } from 'lucide-react';
 import Link from 'next/link';
 import { createBoard } from '@/app/(app)/dashboard/actions';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import type { BoardSummary } from '@/types/board';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 const CARD_CLASS =
   'flex h-24 items-center rounded-xl bg-muted/60 p-4 text-sm font-medium';
@@ -18,7 +19,7 @@ interface BoardGridProps {
 export function BoardGrid({ boards }: BoardGridProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [name, setName] = useState('');
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
 
   function close() {
     setName('');
@@ -28,7 +29,7 @@ export function BoardGrid({ boards }: BoardGridProps) {
   function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!name.trim()) return;
-    startTransition(() => createBoard(name));
+    runAction(() => createBoard(name));
   }
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { XIcon } from 'lucide-react';
 import { removeBoardMember } from '@/app/(app)/dashboard/actions';
 import { AddBoardMemberSearch } from '@/components/features/board/AddBoardMemberSearch';
@@ -8,6 +8,7 @@ import { ArchiveBoardDialog } from '@/components/features/board/ArchiveBoardDial
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Button } from '@/components/ui/Button';
 import type { BoardUser } from '@/types/board';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface BoardSettingsProps {
   boardId: string;
@@ -27,10 +28,10 @@ export function BoardSettings({
   isOwner,
 }: BoardSettingsProps) {
   const [isArchiving, setIsArchiving] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
 
   function remove(userId: string) {
-    startTransition(() => removeBoardMember(boardId, userId));
+    runAction(() => removeBoardMember(boardId, userId));
   }
 
   return (

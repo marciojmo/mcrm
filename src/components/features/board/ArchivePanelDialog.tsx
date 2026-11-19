@@ -1,6 +1,5 @@
 'use client';
 
-import { useTransition } from 'react';
 import { archivePanel } from '@/app/(app)/dashboard/actions';
 import { Button } from '@/components/ui/Button';
 import {
@@ -12,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/Dialog';
 import type { BoardPanel } from '@/types/board';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface ArchivePanelDialogProps {
   panel: BoardPanel;
@@ -24,11 +24,11 @@ export function ArchivePanelDialog({
   isOpen,
   onOpenChange,
 }: ArchivePanelDialogProps) {
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
   const taskCount = panel.tasks.length;
 
   function confirm() {
-    startTransition(async () => {
+    runAction(async () => {
       await archivePanel(panel.id);
       onOpenChange(false);
     });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import {
   ArchiveIcon,
   CopyIcon,
@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
 import { useToast } from '@/components/ui/Toast';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface TaskMenuProps {
   taskId: string;
@@ -29,7 +30,7 @@ interface TaskMenuProps {
 
 export function TaskMenu({ taskId, isFollowing, onClose }: TaskMenuProps) {
   const [isArchiving, setIsArchiving] = useState(false);
-  const [, startTransition] = useTransition();
+  const { runAction } = useSafeTransition();
   const toast = useToast();
 
   return (
@@ -50,7 +51,7 @@ export function TaskMenu({ taskId, isFollowing, onClose }: TaskMenuProps) {
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem
             onClick={() =>
-              startTransition(async () => {
+              runAction(async () => {
                 await toggleTaskFollower(taskId);
                 toast.add({
                   title: isFollowing ? 'Deixou de seguir' : 'Seguindo Tarefa',
@@ -63,7 +64,7 @@ export function TaskMenu({ taskId, isFollowing, onClose }: TaskMenuProps) {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
-              startTransition(async () => {
+              runAction(async () => {
                 await duplicateTask(taskId);
                 toast.add({ title: 'Tarefa duplicada!' });
                 onClose();

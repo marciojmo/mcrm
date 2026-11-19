@@ -1,6 +1,5 @@
 'use client';
 
-import { useTransition } from 'react';
 import { archiveTask } from '@/app/(app)/dashboard/actions';
 import { Button } from '@/components/ui/Button';
 import {
@@ -11,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface ArchiveTaskDialogProps {
   taskId: string;
@@ -25,10 +25,10 @@ export function ArchiveTaskDialog({
   onOpenChange,
   onArchived,
 }: ArchiveTaskDialogProps) {
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
 
   function confirm() {
-    startTransition(async () => {
+    runAction(async () => {
       await archiveTask(taskId);
       onArchived();
     });

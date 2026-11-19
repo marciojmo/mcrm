@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { PlusIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface AddTextFormProps {
   addLabel: string;
@@ -18,7 +19,7 @@ export function AddTextForm({
 }: AddTextFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [text, setText] = useState('');
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
 
   function close() {
     setText('');
@@ -28,7 +29,7 @@ export function AddTextForm({
   function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!text.trim()) return;
-    startTransition(async () => {
+    runAction(async () => {
       await onSubmit(text);
       close();
     });

@@ -1,6 +1,5 @@
 'use client';
 
-import { useTransition } from 'react';
 import { Trash2Icon, XIcon } from 'lucide-react';
 import {
   addChecklistItem,
@@ -12,6 +11,7 @@ import { AddTextForm } from '@/components/ui/AddTextForm';
 import { Button } from '@/components/ui/Button';
 import { ConfirmDeleteButton } from '@/components/ui/ConfirmDeleteButton';
 import type { Checklist } from '@/types/task';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface ChecklistBlockProps {
   checklist: Checklist;
@@ -19,14 +19,14 @@ interface ChecklistBlockProps {
 }
 
 export function ChecklistBlock({ checklist, onChange }: ChecklistBlockProps) {
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
   const doneCount = checklist.items.filter((item) => item.isDone).length;
   const percent = checklist.items.length
     ? Math.round((doneCount / checklist.items.length) * 100)
     : 0;
 
   function run(action: () => Promise<void>) {
-    startTransition(async () => {
+    runAction(async () => {
       await action();
       await onChange();
     });

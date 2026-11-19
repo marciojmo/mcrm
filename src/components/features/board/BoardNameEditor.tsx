@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { renameBoard } from '@/app/(app)/dashboard/actions';
 import { Input } from '@/components/ui/Input';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface BoardNameEditorProps {
   boardId: string;
@@ -12,7 +13,7 @@ interface BoardNameEditorProps {
 export function BoardNameEditor({ boardId, boardName }: BoardNameEditorProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(boardName);
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const hasEdited = useRef(false);
 
@@ -31,7 +32,7 @@ export function BoardNameEditor({ boardId, boardName }: BoardNameEditorProps) {
     if (isPending) return;
     const trimmed = name.trim();
     if (!trimmed || trimmed === boardName) return setIsEditing(false);
-    startTransition(async () => {
+    runAction(async () => {
       await renameBoard(boardId, trimmed);
       setIsEditing(false);
     });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { ChevronLeftIcon } from 'lucide-react';
 import {
   createLabel,
@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/Input';
 import { LABEL_COLORS } from '@/constants/labelColors';
 import { cn } from '@/lib/utils';
 import type { BoardLabel } from '@/types/board';
+import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface LabelFormProps {
   label: BoardLabel | null;
@@ -23,10 +24,10 @@ interface LabelFormProps {
 export function LabelForm({ label, onDone }: LabelFormProps) {
   const [name, setName] = useState(label?.name ?? '');
   const [color, setColor] = useState(label?.color ?? LABEL_COLORS[0]);
-  const [isPending, startTransition] = useTransition();
+  const { isPending, runAction } = useSafeTransition();
 
   function run(action: () => Promise<void>) {
-    startTransition(async () => {
+    runAction(async () => {
       await action();
       onDone();
     });
