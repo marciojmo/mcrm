@@ -43,9 +43,9 @@ export function CommentsSection({
     if (!body.trim()) return;
     runAction(async () => {
       await addComment(taskId, body, mentionedIds);
-      await onChange();
       setBody('');
       setMentionedIds([]);
+      await onChange();
     });
   }
 

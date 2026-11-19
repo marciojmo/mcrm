@@ -35,9 +35,9 @@ export function AddChecklistPopover({
     if (!title.trim()) return;
     runAction(async () => {
       await addChecklist(taskId, title);
-      await onChange();
       setIsOpen(false);
       setTitle('Checklist');
+      await onChange();
     });
   }
 
