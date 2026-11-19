@@ -1,8 +1,12 @@
 import { prisma } from '@/lib/prisma';
+import { lockChecklist, lockTask } from '@/services/rowLocks';
 
 export async function addChecklist(taskId: string, title: string) {
-  const position = await prisma.checklist.count({ where: { taskId } });
-  return prisma.checklist.create({ data: { taskId, title, position } });
+  return prisma.$transaction(async (tx) => {
+    await lockTask(tx, taskId);
+    const position = await tx.checklist.count({ where: { taskId } });
+    return tx.checklist.create({ data: { taskId, title, position } });
+  });
 }
 
 export async function deleteChecklist(checklistId: string) {
@@ -10,8 +14,11 @@ export async function deleteChecklist(checklistId: string) {
 }
 
 export async function addChecklistItem(checklistId: string, text: string) {
-  const position = await prisma.checklistItem.count({ where: { checklistId } });
-  return prisma.checklistItem.create({ data: { checklistId, text, position } });
+  return prisma.$transaction(async (tx) => {
+    await lockChecklist(tx, checklistId);
+    const position = await tx.checklistItem.count({ where: { checklistId } });
+    return tx.checklistItem.create({ data: { checklistId, text, position } });
+  });
 }
 
 export async function setChecklistItemDone(itemId: string, isDone: boolean) {

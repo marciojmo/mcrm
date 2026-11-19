@@ -1,5 +1,6 @@
 import type { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
+import { lockPanels } from '@/services/rowLocks';
 import type { TaskDetails } from '@/types/board';
 
 async function claimTaskNumber(tx: Prisma.TransactionClient, panelId: string) {
@@ -15,9 +16,37 @@ async function claimTaskNumber(tx: Prisma.TransactionClient, panelId: string) {
   return board.lastTaskNumber;
 }
 
+async function nextTaskPosition(tx: Prisma.TransactionClient, panelId: string) {
+  const { _max } = await tx.task.aggregate({
+    where: { panelId, archivedAt: null },
+    _max: { position: true },
+  });
+  return (_max.position ?? -1) + 1;
+}
+
+async function renumberTasks(
+  tx: Prisma.TransactionClient,
+  panelId: string,
+  ids?: string[]
+) {
+  const orderedIds =
+    ids ??
+    (
+      await tx.task.findMany({
+        where: { panelId, archivedAt: null },
+        orderBy: { position: 'asc' },
+        select: { id: true },
+      })
+    ).map(({ id }) => id);
+  for (const [position, id] of orderedIds.entries()) {
+    await tx.task.update({ where: { id }, data: { position } });
+  }
+}
+
 export async function createTask(panelId: string, title: string) {
   return prisma.$transaction(async (tx) => {
-    const position = await tx.task.count({ where: { panelId } });
+    await lockPanels(tx, [panelId]);
+    const position = await nextTaskPosition(tx, panelId);
     const number = await claimTaskNumber(tx, panelId);
     return tx.task.create({ data: { panelId, title, position, number } });
   });
@@ -45,44 +74,42 @@ export async function moveTask(
   targetPanelId: string,
   targetIndex: number
 ) {
+  if (!Number.isInteger(targetIndex) || targetIndex < 0) {
+    throw new Error('Invalid index');
+  }
   await prisma.$transaction(async (tx) => {
+    const { panelId: sourcePanelId } = await tx.task.findUniqueOrThrow({
+      where: { id: taskId, archivedAt: null },
+      select: { panelId: true },
+    });
+    await lockPanels(tx, [sourcePanelId, targetPanelId]);
     const task = await tx.task.findUniqueOrThrow({
       where: { id: taskId, archivedAt: null },
     });
+    if (task.panelId !== sourcePanelId) throw new Error('Task moved');
     await tx.panel.findUniqueOrThrow({
       where: { id: targetPanelId, archivedAt: null },
       select: { id: true },
     });
     const targetIds = (
       await tx.task.findMany({
-        where: { panelId: targetPanelId, id: { not: taskId } },
+        where: {
+          panelId: targetPanelId,
+          archivedAt: null,
+          id: { not: taskId },
+        },
         orderBy: { position: 'asc' },
         select: { id: true },
       })
     ).map((item) => item.id);
-    targetIds.splice(targetIndex, 0, taskId);
+    targetIds.splice(Math.min(targetIndex, targetIds.length), 0, taskId);
 
     await tx.task.update({
       where: { id: taskId },
       data: { panelId: targetPanelId },
     });
-    await Promise.all(
-      targetIds.map((id, position) =>
-        tx.task.update({ where: { id }, data: { position } })
-      )
-    );
-
-    if (task.panelId === targetPanelId) return;
-    const sourceIds = await tx.task.findMany({
-      where: { panelId: task.panelId },
-      orderBy: { position: 'asc' },
-      select: { id: true },
-    });
-    await Promise.all(
-      sourceIds.map(({ id }, position) =>
-        tx.task.update({ where: { id }, data: { position } })
-      )
-    );
+    await renumberTasks(tx, targetPanelId, targetIds);
+    if (task.panelId !== targetPanelId) await renumberTasks(tx, task.panelId);
   });
 }
 
@@ -110,9 +137,8 @@ export async function duplicateTask(taskId: string) {
     },
   });
   return prisma.$transaction(async (tx) => {
-    const position = await tx.task.count({
-      where: { panelId: source.panelId, archivedAt: null },
-    });
+    await lockPanels(tx, [source.panelId]);
+    const position = await nextTaskPosition(tx, source.panelId);
     const number = await claimTaskNumber(tx, source.panelId);
     return tx.task.create({
       data: {
