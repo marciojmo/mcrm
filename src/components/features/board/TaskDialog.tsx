@@ -80,7 +80,11 @@ export function TaskDialog({
           <div className="flex flex-wrap items-center gap-2">
             <LabelsPopover task={task} labels={labels} />
             <MembersPopover task={task} users={users} />
-            <AddChecklistPopover taskId={task.id} onChange={reload} />
+            <AddChecklistPopover
+              taskId={task.id}
+              checklistCount={extras?.checklists.length ?? 0}
+              onChange={reload}
+            />
             <AddAttachmentPopover taskId={task.id} onChange={reload} />
             <DueDateField
               value={details.dueDate}

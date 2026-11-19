@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { PencilIcon, TagIcon } from 'lucide-react';
 import { toggleTaskLabel } from '@/app/(app)/dashboard/taskActions';
 import { LabelChip } from '@/components/features/board/LabelChip';
@@ -12,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/Popover';
+import { useFocusAfterRemoval } from '@/hooks/useFocusAfterRemoval';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 import type { BoardLabel, BoardTask } from '@/types/board';
 
@@ -24,6 +25,8 @@ export function LabelsPopover({ task, labels }: LabelsPopoverProps) {
   const [query, setQuery] = useState('');
   const [editing, setEditing] = useState<BoardLabel | 'new' | null>(null);
   const { runAction } = useSafeTransition();
+  const searchRef = useRef<HTMLInputElement>(null);
+  useFocusAfterRemoval(editing ? 1 : 0, () => searchRef.current);
   const matches = labels.filter((label) =>
     label.name.toLowerCase().includes(query.trim().toLowerCase())
   );
@@ -44,6 +47,7 @@ export function LabelsPopover({ task, labels }: LabelsPopoverProps) {
         ) : (
           <div className="flex flex-col gap-2">
             <Input
+              ref={searchRef}
               value={query}
               placeholder="Buscar etiquetas"
               onChange={(event) => setQuery(event.target.value)}
