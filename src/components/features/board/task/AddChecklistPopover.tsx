@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { SquareCheckIcon } from 'lucide-react';
 import { addChecklist } from '@/app/(app)/dashboard/taskActions';
 import { Button, buttonVariants } from '@/components/ui/Button';
@@ -10,20 +10,25 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/Popover';
+import { useFocusAfterRemoval } from '@/hooks/useFocusAfterRemoval';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface AddChecklistPopoverProps {
   taskId: string;
+  checklistCount: number;
   onChange: () => Promise<void>;
 }
 
 export function AddChecklistPopover({
   taskId,
+  checklistCount,
   onChange,
 }: AddChecklistPopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('Checklist');
   const { isPending, runAction } = useSafeTransition();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  useFocusAfterRemoval(checklistCount, () => triggerRef.current);
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -39,6 +44,7 @@ export function AddChecklistPopover({
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger
+        ref={triggerRef}
         className={buttonVariants({ variant: 'outline', size: 'sm' })}
       >
         <SquareCheckIcon /> Checklist
