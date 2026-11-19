@@ -53,8 +53,13 @@ export function ArchivePanelDialog({
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button variant="destructive" disabled={isPending} onClick={confirm}>
-            Arquivar painel
+          <Button
+            variant="destructive"
+            disabled={isPending}
+            aria-busy={isPending}
+            onClick={confirm}
+          >
+            {isPending ? 'Arquivando…' : 'Arquivar painel'}
           </Button>
         </DialogFooter>
       </DialogContent>
