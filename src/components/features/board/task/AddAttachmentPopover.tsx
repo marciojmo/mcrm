@@ -19,6 +19,10 @@ interface AddAttachmentPopoverProps {
   onChange: () => Promise<void>;
 }
 
+function isHttpUrl(value: string) {
+  return URL.canParse(value) && /^https?:$/.test(new URL(value).protocol);
+}
+
 export function AddAttachmentPopover({
   taskId,
   onChange,
@@ -60,12 +64,13 @@ export function AddAttachmentPopover({
 
   function attachLink(event: React.FormEvent) {
     event.preventDefault();
+    if (!isHttpUrl(url.trim())) {
+      setError('Informe um link válido (http ou https).');
+      return;
+    }
+    setError('');
     runAction(async () => {
-      try {
-        await addLinkAttachment(taskId, url, name);
-      } catch {
-        return setError('Informe um link válido (http ou https).');
-      }
+      await addLinkAttachment(taskId, url, name);
       await onChange();
       finish();
     });
