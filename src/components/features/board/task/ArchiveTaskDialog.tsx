@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { ARCHIVE_ERROR_MESSAGE } from '@/constants/errorMessages';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface ArchiveTaskDialogProps {
@@ -28,10 +29,13 @@ export function ArchiveTaskDialog({
   const { isPending, runAction } = useSafeTransition();
 
   function confirm() {
-    runAction(async () => {
-      await archiveTask(taskId);
-      onArchived();
-    });
+    runAction(
+      async () => {
+        await archiveTask(taskId);
+        onArchived();
+      },
+      { errorMessage: ARCHIVE_ERROR_MESSAGE }
+    );
   }
 
   return (

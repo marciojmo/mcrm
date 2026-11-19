@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { DELETE_ERROR_MESSAGE } from '@/constants/errorMessages';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface DeleteAttachmentDialogProps {
@@ -30,11 +31,14 @@ export function DeleteAttachmentDialog({
   const { isPending, runAction } = useSafeTransition();
 
   function confirm() {
-    runAction(async () => {
-      await deleteAttachment(attachmentId);
-      await onDeleted();
-      onOpenChange(false);
-    });
+    runAction(
+      async () => {
+        await deleteAttachment(attachmentId);
+        await onDeleted();
+        onOpenChange(false);
+      },
+      { errorMessage: DELETE_ERROR_MESSAGE }
+    );
   }
 
   return (

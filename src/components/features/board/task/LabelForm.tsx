@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/Input';
 import { LABEL_COLORS } from '@/constants/labelColors';
 import { cn } from '@/lib/utils';
 import type { BoardLabel } from '@/types/board';
+import { DELETE_ERROR_MESSAGE } from '@/constants/errorMessages';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface LabelFormProps {
@@ -26,11 +27,14 @@ export function LabelForm({ label, onDone }: LabelFormProps) {
   const [color, setColor] = useState(label?.color ?? LABEL_COLORS[0]);
   const { isPending, runAction } = useSafeTransition();
 
-  function run(action: () => Promise<void>) {
-    runAction(async () => {
-      await action();
-      onDone();
-    });
+  function run(action: () => Promise<void>, errorMessage?: string) {
+    runAction(
+      async () => {
+        await action();
+        onDone();
+      },
+      { errorMessage }
+    );
   }
 
   function save() {
@@ -85,7 +89,9 @@ export function LabelForm({ label, onDone }: LabelFormProps) {
           <ConfirmDeleteButton
             size="sm"
             isPending={isPending}
-            onConfirm={() => run(() => deleteLabel(label.id))}
+            onConfirm={() =>
+              run(() => deleteLabel(label.id), DELETE_ERROR_MESSAGE)
+            }
           >
             Excluir
           </ConfirmDeleteButton>
