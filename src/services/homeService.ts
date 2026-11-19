@@ -1,5 +1,6 @@
 import { calculateTaskStats } from '@/lib/calculateTaskStats';
 import { prisma } from '@/lib/prisma';
+import { visibleTo } from '@/services/boardService';
 import type { HomeOverview, HomeView } from '@/types/home';
 
 const MAX_DEADLINES = 3;
@@ -64,7 +65,10 @@ export async function getHomeOverview(
         ...(view === 'notifications'
           ? {}
           : { NOT: { seenByUserIds: { has: userId } } }),
-        task: { archivedAt: null },
+        task: {
+          archivedAt: null,
+          panel: { archivedAt: null, board: visibleTo(userId) },
+        },
       },
       orderBy: { createdAt: 'desc' },
       take: isOverview ? MAX_MENTIONS : undefined,

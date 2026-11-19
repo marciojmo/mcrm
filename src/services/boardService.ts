@@ -8,7 +8,7 @@ import {
 import type { BoardDetails, BoardSummary, BoardUser } from '@/types/board';
 import type { TaskReference } from '@/types/task';
 
-function visibleTo(userId: string) {
+export function visibleTo(userId: string) {
   return {
     archivedAt: null,
     OR: [{ ownerId: userId }, { members: { some: { userId } } }],
@@ -60,6 +60,13 @@ export function assertAttachmentAccess(userId: string, attachmentId: string) {
   return assertVisibleBoard(
     userId,
     withTask({ attachments: { some: { id: attachmentId } } })
+  );
+}
+
+export function assertCommentAccess(userId: string, commentId: string) {
+  return assertVisibleBoard(
+    userId,
+    withTask({ comments: { some: { id: commentId } } })
   );
 }
 
