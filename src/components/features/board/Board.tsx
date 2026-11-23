@@ -10,6 +10,7 @@ import {
   SortableContext,
 } from '@dnd-kit/sortable';
 import { createPanel } from '@/app/(app)/dashboard/actions';
+import { BoardAutoRefresh } from '@/components/features/board/BoardAutoRefresh';
 import { BoardBreadcrumb } from '@/components/features/board/BoardBreadcrumb';
 import { LabelFilter } from '@/components/features/board/LabelFilter';
 import { PanelColumn } from '@/components/features/board/PanelColumn';
@@ -50,10 +51,6 @@ export function Board({
 }: BoardProps) {
   const [panels, setPanels] = useState(serverPanels);
   const [syncedPanels, setSyncedPanels] = useState(serverPanels);
-  if (serverPanels !== syncedPanels) {
-    setSyncedPanels(serverPanels);
-    setPanels(serverPanels);
-  }
   const router = useRouter();
   const { bfcacheId } = router;
   const [isOnlyMine, setIsOnlyMine] = useState(false);
@@ -82,7 +79,12 @@ export function Board({
     handleDragOver,
     handleDragEnd,
     handleDragCancel,
+    isBusy,
   } = useBoardDrag(panels, setPanels, isDragPaused);
+  if (serverPanels !== syncedPanels && !isBusy) {
+    setSyncedPanels(serverPanels);
+    setPanels(serverPanels);
+  }
 
   const visiblePanels = filterBoardPanels(panels, {
     memberId: isOnlyMine ? currentUserId : null,
@@ -110,6 +112,7 @@ export function Board({
           : DRAG_INSTRUCTIONS,
       }}
     >
+      <BoardAutoRefresh />
       <div className="flex items-center justify-between gap-4 px-4 pt-4">
         <BoardBreadcrumb boardId={boardId} boardName={boardName} />
         <Link
