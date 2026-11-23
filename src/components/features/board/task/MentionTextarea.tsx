@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import {
   MENTION_HIGHLIGHT_CLASS,
   getMentionNames,
+  isCompletedMention,
   splitByMentions,
 } from '@/lib/mentions';
 import type { BoardUser } from '@/types/board';
@@ -39,10 +40,10 @@ export function MentionTextarea({
   const names = getMentionNames(mentionedIds, users);
   const query = MENTION_QUERY.exec(value.slice(0, caret))?.[1];
   const queryStart = caret - (query?.length ?? 0) - 1;
-  const isCompletedMention =
-    query !== undefined && names.some((name) => `@${query}`.startsWith(name));
   const suggestions =
-    query === undefined || isCompletedMention || dismissedAt === queryStart
+    query === undefined ||
+    isCompletedMention(query, names, users) ||
+    dismissedAt === queryStart
       ? []
       : users
           .filter((user) =>
@@ -110,7 +111,7 @@ export function MentionTextarea({
         <div
           ref={mirrorRef}
           aria-hidden
-          className="pointer-events-none absolute inset-0 overflow-hidden rounded-lg border border-transparent px-2.5 py-2 text-base break-words whitespace-pre-wrap md:text-sm dark:bg-input/30"
+          className="pointer-events-none absolute forced-colors:hidden inset-0 overflow-hidden rounded-lg border border-transparent px-2.5 py-2 text-base break-words whitespace-pre-wrap md:text-sm dark:bg-input/30"
         >
           {splitByMentions(value, names).map((part, index) =>
             names.includes(part) ? (
@@ -134,7 +135,7 @@ export function MentionTextarea({
             if (mirrorRef.current)
               mirrorRef.current.scrollTop = event.currentTarget.scrollTop;
           }}
-          className="relative bg-transparent text-transparent caret-foreground selection:bg-primary/25 selection:text-transparent dark:bg-transparent"
+          className="relative bg-transparent text-transparent caret-foreground selection:bg-primary/25 selection:text-transparent dark:bg-transparent forced-colors:text-[CanvasText]"
           role="combobox"
           aria-autocomplete="list"
           aria-expanded={isOpen}
