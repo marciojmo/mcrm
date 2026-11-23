@@ -8,13 +8,15 @@ import { requireSession } from '@/services/sessionService';
 import {
   addBoardMember as addBoardMemberRecord,
   archiveBoard as archiveBoardRecord,
-  assertBoardAccess,
-  assertPanelAccess,
-  assertTaskAccess,
   createBoard as createBoardRecord,
   removeBoardMember as removeBoardMemberRecord,
   renameBoard as renameBoardRecord,
 } from '@/services/boardService';
+import {
+  assertBoardAccess,
+  assertPanelAccess,
+  assertTaskAccess,
+} from '@/services/boardAccessService';
 import {
   archivePanel as archivePanelRecord,
   createPanel as createPanelRecord,
