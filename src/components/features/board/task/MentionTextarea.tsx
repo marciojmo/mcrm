@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useId, useLayoutEffect, useRef, useState } from 'react';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Textarea } from '@/components/ui/Textarea';
 import type { BoardUser } from '@/types/board';
@@ -28,6 +28,8 @@ export function MentionTextarea({
   const [activeIndex, setActiveIndex] = useState(0);
   const [isDismissed, setIsDismissed] = useState(false);
   const listId = useId();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const pendingCaret = useRef<number | null>(null);
   const query = MENTION_QUERY.exec(value.slice(0, caret))?.[1];
   const suggestions =
     query === undefined || isDismissed
@@ -41,6 +43,15 @@ export function MentionTextarea({
   const isOpen = suggestions.length > 0;
   const active = Math.min(activeIndex, suggestions.length - 1);
   const optionId = (userId: string) => `${listId}-${userId}`;
+
+  useLayoutEffect(() => {
+    if (pendingCaret.current === null) return;
+    textareaRef.current?.setSelectionRange(
+      pendingCaret.current,
+      pendingCaret.current
+    );
+    pendingCaret.current = null;
+  }, [value]);
 
   function change(text: string, position: number) {
     setCaret(position);
@@ -60,7 +71,10 @@ export function MentionTextarea({
     const ids = [...new Set([...mentionedIds, user.id])];
     setMentionedIds(ids);
     setActiveIndex(0);
-    setCaret(start + user.name.length + 2);
+    setIsDismissed(true);
+    const position = start + user.name.length + 2;
+    pendingCaret.current = position;
+    setCaret(position);
     onChange(text, ids);
   }
 
@@ -83,6 +97,7 @@ export function MentionTextarea({
   return (
     <div className="flex flex-col gap-1">
       <Textarea
+        ref={textareaRef}
         autoFocus={autoFocus}
         onFocus={(event) => {
           if (!autoFocus) return;
