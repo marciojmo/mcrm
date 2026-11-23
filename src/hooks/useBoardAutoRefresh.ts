@@ -4,12 +4,14 @@ import { useDndMonitor } from '@dnd-kit/core';
 import { hasPendingActions } from '@/hooks/useSafeTransition';
 
 const REFRESH_INTERVAL_MS = 10_000;
-const OPEN_DIALOG_SELECTOR = '[role="dialog"], [role="alertdialog"]';
-const EDITABLE_SELECTOR = 'input, textarea, select, [contenteditable="true"]';
+const OPEN_OVERLAY_SELECTOR =
+  '[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]';
+const EDITABLE_SELECTOR =
+  'input, textarea, select, [contenteditable]:not([contenteditable="false"])';
 
 function isEditing() {
   return (
-    document.querySelector(OPEN_DIALOG_SELECTOR) !== null ||
+    document.querySelector(OPEN_OVERLAY_SELECTOR) !== null ||
     document.activeElement?.matches(EDITABLE_SELECTOR) === true
   );
 }

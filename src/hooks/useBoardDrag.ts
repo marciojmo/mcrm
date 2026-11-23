@@ -67,7 +67,8 @@ export function useBoardDrag(
   const savedPanels = useRef(panels);
   const dragOrigin = useRef<DragOrigin | null>(null);
   const pendingMoveCount = useRef(0);
-  const { runAction } = useSafeTransition();
+  const [isDragging, setIsDragging] = useState(false);
+  const { isPending, runAction } = useSafeTransition();
   const keyboardSensor = useSensor(KeyboardSensor, {
     coordinateGetter: sortableKeyboardCoordinates,
   });
@@ -89,6 +90,7 @@ export function useBoardDrag(
   );
 
   function handleDragStart({ active }: DragStartEvent) {
+    setIsDragging(true);
     if (pendingMoveCount.current === 0) savedPanels.current = panels;
     const id = String(active.id);
     if (active.data.current?.type !== 'task') {
@@ -122,6 +124,7 @@ export function useBoardDrag(
 
   function handleDragEnd({ active, over }: DragEndEvent) {
     setActiveTask(null);
+    setIsDragging(false);
     if (!over) {
       handleDragCancel();
       return;
@@ -153,6 +156,7 @@ export function useBoardDrag(
 
   function handleDragCancel() {
     setActiveTask(null);
+    setIsDragging(false);
     const origin = dragOrigin.current;
     if (origin) setPanels((current) => restoreOrigin(current, origin));
   }
@@ -172,5 +176,6 @@ export function useBoardDrag(
     handleDragOver,
     handleDragEnd,
     handleDragCancel,
+    isBusy: isDragging || isPending,
   };
 }

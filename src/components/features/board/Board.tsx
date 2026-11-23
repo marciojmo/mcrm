@@ -51,10 +51,6 @@ export function Board({
 }: BoardProps) {
   const [panels, setPanels] = useState(serverPanels);
   const [syncedPanels, setSyncedPanels] = useState(serverPanels);
-  if (serverPanels !== syncedPanels) {
-    setSyncedPanels(serverPanels);
-    setPanels(serverPanels);
-  }
   const router = useRouter();
   const { bfcacheId } = router;
   const [isOnlyMine, setIsOnlyMine] = useState(false);
@@ -83,7 +79,12 @@ export function Board({
     handleDragOver,
     handleDragEnd,
     handleDragCancel,
+    isBusy,
   } = useBoardDrag(panels, setPanels, isDragPaused);
+  if (serverPanels !== syncedPanels && !isBusy) {
+    setSyncedPanels(serverPanels);
+    setPanels(serverPanels);
+  }
 
   const visiblePanels = filterBoardPanels(panels, {
     memberId: isOnlyMine ? currentUserId : null,
