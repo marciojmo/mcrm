@@ -79,6 +79,7 @@ model Board {
   key            String        @unique @db.VarChar(4)
   lastTaskNumber Int           @default(0) @map("last_task_number")
   ownerId        String        @map("owner_id")
+  background     String?       @db.VarChar(32)
   archivedAt     DateTime?     @map("archived_at")
   createdAt      DateTime      @default(now()) @map("created_at")
   owner          User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)

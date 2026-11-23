@@ -45,4 +45,5 @@ export interface BoardSummary {
 
 export interface BoardDetails extends BoardSummary {
   ownerId: string;
+  background: string | null;
 }

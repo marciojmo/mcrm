@@ -4,13 +4,14 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { MAX_DESCRIPTION_LENGTH } from '@/constants/task';
 import type { TaskDetails } from '@/types/board';
-import { requireSession } from '@/services/sessionService';
+import { isAdminEmail, requireSession } from '@/services/sessionService';
 import {
   addBoardMember as addBoardMemberRecord,
   archiveBoard as archiveBoardRecord,
   createBoard as createBoardRecord,
   removeBoardMember as removeBoardMemberRecord,
   renameBoard as renameBoardRecord,
+  setBoardBackground as setBoardBackgroundRecord,
 } from '@/services/boardService';
 import {
   assertBoardAccess,
@@ -68,6 +69,20 @@ export async function renameBoard(boardId: string, name: string) {
   const { user } = await requireSession();
   await assertBoardAccess(user.id, boardId);
   await renameBoardRecord(boardId, cleanText(name));
+  revalidatePath('/dashboard', 'layout');
+}
+
+export async function setBoardBackground(
+  boardId: string,
+  background: string | null
+) {
+  const { user } = await requireSession();
+  await setBoardBackgroundRecord(
+    boardId,
+    user.id,
+    isAdminEmail(user.email),
+    background
+  );
   revalidatePath('/dashboard', 'layout');
 }
 
