@@ -10,5 +10,27 @@ services:
     volumes:
       - mcrm-db:/var/lib/postgresql/data
 
+  minio:
+    image: cgr.dev/chainguard/minio
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - mcrm-minio:/data
+
+  minio-init:
+    image: cgr.dev/chainguard/minio-client
+    depends_on:
+      - minio
+    restart: on-failure
+    environment:
+      MC_HOST_local: http://minioadmin:minioadmin@minio:9000
+    command: mb --ignore-existing local/mcrm-uploads
+
 volumes:
   mcrm-db:
+  mcrm-minio:
