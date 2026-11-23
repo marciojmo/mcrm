@@ -1,4 +1,9 @@
 import Link from 'next/link';
+import {
+  MENTION_HIGHLIGHT_CLASS,
+  getMentionNames,
+  splitByMentions,
+} from '@/lib/mentions';
 import { splitByTaskIdentifiers } from '@/lib/taskIdentifier';
 import type { BoardUser } from '@/types/board';
 import type { TaskComment, TaskReference } from '@/types/task';
@@ -10,26 +15,14 @@ interface CommentBodyProps {
   onOpenTask: (reference: TaskReference) => void;
 }
 
-function escapeRegExp(text: string) {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 export function CommentBody({
   comment,
   users,
   taskReferences,
   onOpenTask,
 }: CommentBodyProps) {
-  const names = comment.mentionedUserIds
-    .map((id) => users.find((user) => user.id === id)?.name)
-    .filter((name): name is string => Boolean(name))
-    .map((name) => `@${name}`);
-  const mentionParts =
-    names.length === 0
-      ? [comment.body]
-      : comment.body.split(
-          new RegExp(`(${names.map(escapeRegExp).join('|')})`)
-        );
+  const names = getMentionNames(comment.mentionedUserIds, users);
+  const mentionParts = splitByMentions(comment.body, names);
 
   function renderText(text: string, key: number) {
     return splitByTaskIdentifiers(text).map((part, index) => {
@@ -57,7 +50,7 @@ export function CommentBody({
         names.includes(part) ? (
           <span
             key={index}
-            className="rounded bg-primary/10 px-1 font-medium text-primary"
+            className={`${MENTION_HIGHLIGHT_CLASS} px-1 font-medium`}
           >
             {part}
           </span>
