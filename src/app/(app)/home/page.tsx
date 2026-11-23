@@ -1,4 +1,6 @@
 import { Suspense } from 'react';
+import { env } from '@/config/env';
+import { getToday } from '@/lib/appTime';
 import { HomeOverview } from '@/components/features/home/HomeOverview';
 import { getHomeOverview } from '@/services/homeService';
 import { requireSession } from '@/services/sessionService';
@@ -16,7 +18,7 @@ async function Home({
 }) {
   const view = parseView((await searchParams).view);
   const { user } = await requireSession();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getToday(env.APP_TIME_ZONE);
   const overview = await getHomeOverview(user.id, user.name, today, view);
   return <HomeOverview overview={overview} today={today} view={view} />;
 }

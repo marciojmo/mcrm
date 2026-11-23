@@ -8,6 +8,7 @@ import { forwardRef, type HTMLAttributes } from 'react';
 import { TaskCheckbox } from '@/components/features/board/TaskCheckbox';
 import { LabelChip } from '@/components/features/board/LabelChip';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
+import { useAppTimeZone } from '@/components/layouts/AppTimeZoneProvider';
 import { formatDueDate, isOverdue } from '@/lib/formatDueDate';
 import { cn } from '@/lib/utils';
 import type { BoardLabel, BoardTask, BoardUser } from '@/types/board';
@@ -39,8 +40,9 @@ export const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(
       task.labelIds.includes(label.id)
     );
     const members = users.filter((user) => task.memberIds.includes(user.id));
+    const timeZone = useAppTimeZone();
     const isTaskOverdue =
-      !task.isCompleted && !!task.dueDate && isOverdue(task.dueDate);
+      !task.isCompleted && !!task.dueDate && isOverdue(task.dueDate, timeZone);
 
     return (
       <div

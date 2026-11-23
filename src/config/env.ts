@@ -11,6 +11,16 @@ function readList(name: string) {
     .filter(Boolean);
 }
 
+function readTimeZone(name: string) {
+  const value = process.env[name] || 'America/Sao_Paulo';
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: value });
+  } catch {
+    throw new Error(`Invalid time zone in ${name}: ${value}`);
+  }
+  return value;
+}
+
 export const env = Object.freeze({
   DATABASE_URL: readRequired('DATABASE_URL'),
   BETTER_AUTH_SECRET: readRequired('BETTER_AUTH_SECRET'),
@@ -19,4 +29,5 @@ export const env = Object.freeze({
   GOOGLE_CLIENT_SECRET: readRequired('GOOGLE_CLIENT_SECRET'),
   GOOGLE_WORKSPACE_DOMAIN: readRequired('GOOGLE_WORKSPACE_DOMAIN'),
   ADMIN_EMAILS: readList('ADMIN_EMAILS'),
+  APP_TIME_ZONE: readTimeZone('APP_TIME_ZONE'),
 });

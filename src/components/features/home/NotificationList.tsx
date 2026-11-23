@@ -1,6 +1,8 @@
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { MarkMentionSeenButton } from '@/components/features/home/MarkMentionSeenButton';
 import { MentionLink } from '@/components/features/home/MentionLink';
+import { env } from '@/config/env';
+import { formatDateTime } from '@/lib/appTime';
 import { cn } from '@/lib/utils';
 import type { HomeMention } from '@/types/home';
 
@@ -48,7 +50,7 @@ export function NotificationList({ mentions }: { mentions: HomeMention[] }) {
                 {mention.body}
               </span>
               <span className="text-xs text-muted-foreground">
-                {new Date(mention.createdAt).toLocaleString('pt-BR')}
+                {formatDateTime(mention.createdAt, env.APP_TIME_ZONE)}
               </span>
             </span>
           </MentionLink>

@@ -1,4 +1,6 @@
 import { Suspense } from 'react';
+import { env } from '@/config/env';
+import { getToday } from '@/lib/appTime';
 import { CollaboratorTable } from '@/components/features/admin/CollaboratorTable';
 import { listCollaborators } from '@/services/adminService';
 import { requireAdmin } from '@/services/sessionService';
@@ -6,7 +8,7 @@ import AdminLoading from './loading';
 
 async function Overview() {
   await requireAdmin();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getToday(env.APP_TIME_ZONE);
   const collaborators = await listCollaborators(today);
   return (
     <div className="flex flex-col gap-4 p-6">

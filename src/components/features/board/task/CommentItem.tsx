@@ -10,6 +10,8 @@ import { MentionTextarea } from '@/components/features/board/task/MentionTextare
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Button } from '@/components/ui/Button';
 import { ConfirmDeleteButton } from '@/components/ui/ConfirmDeleteButton';
+import { useAppTimeZone } from '@/components/layouts/AppTimeZoneProvider';
+import { formatDateTime } from '@/lib/appTime';
 import { cn } from '@/lib/utils';
 import type { BoardUser } from '@/types/board';
 import type { TaskComment, TaskReference } from '@/types/task';
@@ -35,6 +37,7 @@ export function CommentItem({
   onChange,
   onOpenTask,
 }: CommentItemProps) {
+  const timeZone = useAppTimeZone();
   const itemRef = useRef<HTMLLIElement>(null);
   useEffect(() => {
     if (isHighlighted) itemRef.current?.scrollIntoView({ block: 'center' });
@@ -73,7 +76,7 @@ export function CommentItem({
         <p className="font-medium">
           {comment.author.name}{' '}
           <span className="text-xs font-normal text-muted-foreground">
-            {new Date(comment.createdAt).toLocaleString('pt-BR')}
+            {formatDateTime(comment.createdAt, timeZone)}
           </span>
         </p>
         {isEditing ? (
