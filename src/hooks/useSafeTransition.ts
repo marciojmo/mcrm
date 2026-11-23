@@ -4,6 +4,12 @@ import { useToast } from '@/components/ui/Toast';
 
 export const SAVE_ERROR_MESSAGE = 'Não foi possível salvar. Tente novamente.';
 
+let pendingActionCount = 0;
+
+export function hasPendingActions() {
+  return pendingActionCount > 0;
+}
+
 interface ActionOptions {
   onError?: () => void;
   errorMessage?: string | null;
@@ -19,6 +25,7 @@ export function useSafeTransition() {
   ) {
     return new Promise<boolean>((resolve) =>
       startTransition(async () => {
+        pendingActionCount += 1;
         try {
           await action();
           resolve(true);
@@ -28,6 +35,8 @@ export function useSafeTransition() {
           if (errorMessage)
             toast.add({ title: errorMessage, priority: 'high' });
           resolve(false);
+        } finally {
+          pendingActionCount -= 1;
         }
       })
     );

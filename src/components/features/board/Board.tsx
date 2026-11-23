@@ -10,6 +10,7 @@ import {
   SortableContext,
 } from '@dnd-kit/sortable';
 import { createPanel } from '@/app/(app)/dashboard/actions';
+import { BoardAutoRefresh } from '@/components/features/board/BoardAutoRefresh';
 import { BoardBreadcrumb } from '@/components/features/board/BoardBreadcrumb';
 import { LabelFilter } from '@/components/features/board/LabelFilter';
 import { PanelColumn } from '@/components/features/board/PanelColumn';
@@ -110,6 +111,7 @@ export function Board({
           : DRAG_INSTRUCTIONS,
       }}
     >
+      <BoardAutoRefresh />
       <div className="flex items-center justify-between gap-4 px-4 pt-4">
         <BoardBreadcrumb boardId={boardId} boardName={boardName} />
         <Link
