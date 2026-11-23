@@ -1,3 +1,5 @@
+import { env } from '@/config/env';
+import { getStartOfDay } from '@/lib/appTime';
 import { calculateTaskStats } from '@/lib/calculateTaskStats';
 import { prisma } from '@/lib/prisma';
 import type {
@@ -81,8 +83,12 @@ export async function getCollaboratorReport(
   userId: string,
   today: string
 ): Promise<CollaboratorReport | null> {
-  const since = new Date(`${today}T00:00:00Z`);
-  since.setUTCDate(since.getUTCDate() - REPORT_WINDOW_DAYS);
+  const windowStart = new Date(`${today}T00:00:00Z`);
+  windowStart.setUTCDate(windowStart.getUTCDate() - REPORT_WINDOW_DAYS);
+  const since = getStartOfDay(
+    windowStart.toISOString().slice(0, 10),
+    env.APP_TIME_ZONE
+  );
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {

@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 import { UserMenu } from '@/components/features/auth/UserMenu';
 import { MobileSidebar } from '@/components/layouts/MobileSidebar';
 import { Sidebar } from '@/components/layouts/Sidebar';
+import { AppTimeZoneProvider } from '@/components/layouts/AppTimeZoneProvider';
+import { env } from '@/config/env';
 import { getAppName } from '@/services/appSettingService';
 import { listBoards } from '@/services/boardService';
 import { isAdminEmail, requireSession } from '@/services/sessionService';
@@ -55,7 +57,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <AppHeader />
           </Suspense>
         </header>
-        <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+        <main className="flex min-h-0 flex-1 flex-col">
+          <AppTimeZoneProvider timeZone={env.APP_TIME_ZONE}>
+            {children}
+          </AppTimeZoneProvider>
+        </main>
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+import { getToday } from '@/lib/appTime';
+
 export function formatDueDate(isoDate: string) {
   return new Date(isoDate).toLocaleDateString('pt-BR', {
     day: '2-digit',
@@ -6,6 +8,6 @@ export function formatDueDate(isoDate: string) {
   });
 }
 
-export function isOverdue(isoDate: string) {
-  return isoDate < new Date().toISOString().slice(0, 10);
+export function isOverdue(isoDate: string, timeZone: string) {
+  return isoDate < getToday(timeZone);
 }

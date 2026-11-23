@@ -1,4 +1,6 @@
 import { Suspense } from 'react';
+import { env } from '@/config/env';
+import { getToday } from '@/lib/appTime';
 import { notFound } from 'next/navigation';
 import { CollaboratorReport } from '@/components/features/admin/CollaboratorReport';
 import { getCollaboratorReport } from '@/services/adminService';
@@ -12,7 +14,7 @@ async function Report({
 }) {
   const { userId } = await params;
   await requireAdmin();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getToday(env.APP_TIME_ZONE);
   const report = await getCollaboratorReport(userId, today);
   if (!report) notFound();
   return <CollaboratorReport report={report} today={today} />;
