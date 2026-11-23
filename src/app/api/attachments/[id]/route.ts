@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAttachment } from '@/services/attachmentService';
-import { assertAttachmentReadAccess } from '@/services/boardService';
+import { assertAttachmentReadAccess } from '@/services/boardAccessService';
 import { readStoredFile } from '@/services/fileStorage';
 import { getSession } from '@/services/sessionService';
 

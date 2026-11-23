@@ -2,7 +2,7 @@ import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { MAX_UPLOAD_BYTES } from '@/constants/storage';
 import { addFileAttachment } from '@/services/attachmentService';
-import { assertTaskAccess } from '@/services/boardService';
+import { assertTaskAccess } from '@/services/boardAccessService';
 import { getSession } from '@/services/sessionService';
 
 export async function POST(request: Request) {

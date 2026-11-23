@@ -34,7 +34,7 @@ import {
   assertLabelAccess,
   assertTaskAccess,
   assertTaskReadAccess,
-} from '@/services/boardService';
+} from '@/services/boardAccessService';
 import { requireSession } from '@/services/sessionService';
 import { getTaskExtras as getTaskExtrasRecord } from '@/services/taskExtrasService';
 
