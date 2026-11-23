@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { ExternalLink } from '@/components/ui/ExternalLink';
+import { linkify } from '@/lib/linkify';
 import {
   MENTION_HIGHLIGHT_CLASS,
   getMentionNames,
@@ -25,6 +27,16 @@ export function CommentBody({
   const mentionParts = splitByMentions(comment.body, names);
 
   function renderText(text: string, key: number) {
+    return linkify(text).map((segment, segmentIndex) =>
+      segment.isLink ? (
+        <ExternalLink key={`${key}-${segmentIndex}`} href={segment.text} />
+      ) : (
+        renderTaskReferences(segment.text, `${key}-${segmentIndex}`)
+      )
+    );
+  }
+
+  function renderTaskReferences(text: string, key: string) {
     return splitByTaskIdentifiers(text).map((part, index) => {
       const reference = taskReferences.find((item) => item.identifier === part);
       if (!reference) return part;
