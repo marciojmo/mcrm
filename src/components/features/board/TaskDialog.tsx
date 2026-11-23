@@ -11,14 +11,13 @@ import { CommentsSection } from '@/components/features/board/task/CommentsSectio
 import { DueDateField } from '@/components/features/board/task/DueDateField';
 import { LabelsPopover } from '@/components/features/board/task/LabelsPopover';
 import { MembersPopover } from '@/components/features/board/task/MembersPopover';
+import { TaskDescription } from '@/components/features/board/task/TaskDescription';
 import { TaskMenu } from '@/components/features/board/task/TaskMenu';
 import { TaskCheckbox } from '@/components/features/board/TaskCheckbox';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
 import { Tooltip } from '@/components/ui/Tooltip';
-import { MAX_DESCRIPTION_LENGTH } from '@/constants/task';
 import { useTaskCompletion } from '@/hooks/useTaskCompletion';
 import { useTaskDraft } from '@/hooks/useTaskDraft';
 import { useTaskExtras } from '@/hooks/useTaskExtras';
@@ -127,20 +126,13 @@ export function TaskDialog({
             </div>
           )}
           <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-1">
-            <label className="flex flex-col gap-1.5 text-sm font-semibold">
-              Descrição
-              <Textarea
-                rows={5}
-                maxLength={MAX_DESCRIPTION_LENGTH}
-                value={details.description ?? ''}
-                placeholder="Adicione uma descrição"
-                className="font-normal"
-                onChange={(event) =>
-                  setDetails({ ...details, description: event.target.value })
-                }
-                onBlur={() => saveField()}
-              />
-            </label>
+            <TaskDescription
+              value={details.description ?? ''}
+              onChange={(description) =>
+                setDetails({ ...details, description })
+              }
+              onSave={() => saveField()}
+            />
             {extras?.checklists.map((checklist) => (
               <ChecklistBlock
                 key={checklist.id}
