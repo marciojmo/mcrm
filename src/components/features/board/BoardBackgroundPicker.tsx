@@ -30,7 +30,7 @@ export function BoardBackgroundPicker({
 
   function select(value: string) {
     const next = value === DEFAULT_BACKGROUND ? null : value;
-    if (next === background) return;
+    if (isPending || next === background) return;
     runAction(() => setBoardBackground(boardId, next));
   }
 
@@ -42,7 +42,7 @@ export function BoardBackgroundPicker({
             variant="outline"
             size="icon-sm"
             aria-label="Fundo do quadro"
-            disabled={isPending}
+            aria-disabled={isPending}
           />
         }
       >
