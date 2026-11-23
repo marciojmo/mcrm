@@ -23,12 +23,14 @@ export const NAV_ACTIVE_CLASS =
   'bg-sidebar-accent font-medium text-sidebar-accent-foreground hover:bg-sidebar-accent';
 
 interface SidebarNavProps {
+  appName: string;
   boards: BoardSummary[];
   isAdmin?: boolean;
   onNavigate?: () => void;
 }
 
 export function SidebarNav({
+  appName,
   boards,
   isAdmin = false,
   onNavigate,
@@ -37,7 +39,7 @@ export function SidebarNav({
 
   return (
     <>
-      <span className="px-2 py-1 font-semibold">MCRM</span>
+      <span className="px-2 py-1 font-semibold">{appName}</span>
       <nav className="flex flex-1 flex-col gap-1">
         {NAV_ITEMS.map(({ href, label, Icon }) => (
           <div key={href} className="flex flex-col gap-1">
@@ -87,10 +89,10 @@ export function SidebarNav({
   );
 }
 
-export function Sidebar({ boards, isAdmin = false }: SidebarNavProps) {
+export function Sidebar({ appName, boards, isAdmin = false }: SidebarNavProps) {
   return (
     <aside className="hidden w-56 shrink-0 flex-col gap-4 border-r bg-sidebar p-3 md:flex">
-      <SidebarNav boards={boards} isAdmin={isAdmin} />
+      <SidebarNav appName={appName} boards={boards} isAdmin={isAdmin} />
     </aside>
   );
 }
