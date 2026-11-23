@@ -20,3 +20,7 @@ export const BOARD_BACKGROUNDS = [
     value: 'linear-gradient(135deg, #7c5cd6, #22a6b3)',
   },
 ];
+
+export function getBoardBackgroundValue(key: string | null) {
+  return BOARD_BACKGROUNDS.find((option) => option.key === key)?.value;
+}

@@ -17,7 +17,7 @@ import { TaskDialog } from '@/components/features/board/TaskDialog';
 import { TaskCard } from '@/components/features/board/TaskCard';
 import { AddTextForm } from '@/components/ui/AddTextForm';
 import { Button } from '@/components/ui/Button';
-import { BOARD_BACKGROUNDS } from '@/constants/boardBackgrounds';
+import { getBoardBackgroundValue } from '@/constants/boardBackgrounds';
 import {
   DRAG_ANNOUNCEMENTS,
   DRAG_INSTRUCTIONS,
@@ -95,9 +95,7 @@ export function Board({
     memberId: isOnlyMine ? currentUserId : null,
     labelId: filterLabelId,
   });
-  const backgroundValue = BOARD_BACKGROUNDS.find(
-    (option) => option.key === background
-  )?.value;
+  const backgroundValue = getBoardBackgroundValue(background);
   const boardLabels = labels.filter((label) =>
     panels.some((panel) =>
       panel.tasks.some((task) => task.labelIds.includes(label.id))
