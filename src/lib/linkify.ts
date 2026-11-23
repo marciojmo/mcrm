@@ -4,20 +4,22 @@ export interface LinkifySegment {
 }
 
 const URL_PATTERN = /\bhttps?:\/\/[^\s<>"]+/gi;
-const TRAILING_PUNCTUATION = /[.,;:!?]$/;
-
-function count(text: string, char: string) {
-  return text.split(char).length - 1;
-}
+const TRAILING_PUNCTUATION = '.,;:!?';
 
 function trimUrl(url: string) {
-  let trimmed = url;
-  while (
-    TRAILING_PUNCTUATION.test(trimmed) ||
-    (trimmed.endsWith(')') && count(trimmed, ')') > count(trimmed, '('))
-  )
-    trimmed = trimmed.slice(0, -1);
-  return trimmed;
+  let unmatchedClosing = 0;
+  for (const char of url) {
+    if (char === '(') unmatchedClosing--;
+    if (char === ')') unmatchedClosing++;
+  }
+  let end = url.length;
+  while (end > 0) {
+    const char = url[end - 1];
+    if (char === ')' && unmatchedClosing > 0) unmatchedClosing--;
+    else if (!TRAILING_PUNCTUATION.includes(char)) break;
+    end--;
+  }
+  return url.slice(0, end);
 }
 
 export function linkify(text: string): LinkifySegment[] {
