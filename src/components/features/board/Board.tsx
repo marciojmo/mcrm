@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { EyeIcon, SettingsIcon } from 'lucide-react';
-import Link from 'next/link';
+import { EyeIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { closestCorners, DndContext, DragOverlay } from '@dnd-kit/core';
 import {
@@ -11,13 +10,14 @@ import {
 } from '@dnd-kit/sortable';
 import { createPanel } from '@/app/(app)/dashboard/actions';
 import { BoardAutoRefresh } from '@/components/features/board/BoardAutoRefresh';
-import { BoardBreadcrumb } from '@/components/features/board/BoardBreadcrumb';
+import { BoardHeader } from '@/components/features/board/BoardHeader';
 import { LabelFilter } from '@/components/features/board/LabelFilter';
 import { PanelColumn } from '@/components/features/board/PanelColumn';
 import { TaskDialog } from '@/components/features/board/TaskDialog';
 import { TaskCard } from '@/components/features/board/TaskCard';
 import { AddTextForm } from '@/components/ui/AddTextForm';
-import { Button, buttonVariants } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
+import { BOARD_BACKGROUNDS } from '@/constants/boardBackgrounds';
 import {
   DRAG_ANNOUNCEMENTS,
   DRAG_INSTRUCTIONS,
@@ -25,12 +25,15 @@ import {
 } from '@/constants/dragAccessibility';
 import { useBoardDrag } from '@/hooks/useBoardDrag';
 import { filterBoardPanels } from '@/lib/filterBoardPanels';
+import { cn } from '@/lib/utils';
 import type { BoardLabel, BoardPanel, BoardUser } from '@/types/board';
 import type { TaskReference } from '@/types/task';
 
 interface BoardProps {
   boardId: string;
   boardName: string;
+  background: string | null;
+  canChangeBackground: boolean;
   panels: BoardPanel[];
   users: BoardUser[];
   labels: BoardLabel[];
@@ -42,6 +45,8 @@ interface BoardProps {
 export function Board({
   boardId,
   boardName,
+  background,
+  canChangeBackground,
   panels: serverPanels,
   users,
   labels,
@@ -90,6 +95,9 @@ export function Board({
     memberId: isOnlyMine ? currentUserId : null,
     labelId: filterLabelId,
   });
+  const backgroundValue = BOARD_BACKGROUNDS.find(
+    (option) => option.key === background
+  )?.value;
   const boardLabels = labels.filter((label) =>
     panels.some((panel) =>
       panel.tasks.some((task) => task.labelIds.includes(label.id))
@@ -113,16 +121,12 @@ export function Board({
       }}
     >
       <BoardAutoRefresh />
-      <div className="flex items-center justify-between gap-4 px-4 pt-4">
-        <BoardBreadcrumb boardId={boardId} boardName={boardName} />
-        <Link
-          href={`/dashboard/${boardId}/settings`}
-          aria-label="Configurações"
-          className={buttonVariants({ variant: 'outline', size: 'icon-sm' })}
-        >
-          <SettingsIcon />
-        </Link>
-      </div>
+      <BoardHeader
+        boardId={boardId}
+        boardName={boardName}
+        background={background}
+        canChangeBackground={canChangeBackground}
+      />
       <div className="flex items-center gap-2 px-4 pt-3">
         <Button
           variant={isOnlyMine ? 'default' : 'outline'}
@@ -143,7 +147,10 @@ export function Board({
           {isDragPaused && 'Reordenar está pausado enquanto há filtro ativo'}
         </p>
       </div>
-      <div className="flex flex-1 items-start gap-3 overflow-x-auto p-4">
+      <div
+        className="flex flex-1 items-start gap-3 overflow-x-auto p-4"
+        style={{ background: backgroundValue }}
+      >
         <SortableContext
           items={panels.map((panel) => panel.id)}
           strategy={horizontalListSortingStrategy}
@@ -158,7 +165,12 @@ export function Board({
             />
           ))}
         </SortableContext>
-        <div className="w-72 shrink-0 rounded-xl bg-muted/60 p-2">
+        <div
+          className={cn(
+            'w-72 shrink-0 rounded-xl p-2',
+            backgroundValue ? 'bg-muted' : 'bg-muted/60'
+          )}
+        >
           <AddTextForm
             addLabel="Adicionar painel"
             placeholder="Nome do painel"

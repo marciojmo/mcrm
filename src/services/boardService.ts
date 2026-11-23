@@ -1,4 +1,5 @@
 import { Prisma } from '@/generated/prisma/client';
+import { BOARD_BACKGROUNDS } from '@/constants/boardBackgrounds';
 import { prisma } from '@/lib/prisma';
 import {
   formatTaskIdentifier,
@@ -88,7 +89,7 @@ export async function getBoard(
 ): Promise<BoardDetails | null> {
   return prisma.board.findFirst({
     where: { id: boardId, ...visibleTo(userId) },
-    select: { id: true, name: true, ownerId: true },
+    select: { id: true, name: true, ownerId: true, background: true },
   });
 }
 
@@ -136,6 +137,25 @@ export async function createBoard(name: string, ownerId: string) {
 
 export async function renameBoard(boardId: string, name: string) {
   return prisma.board.update({ where: { id: boardId }, data: { name } });
+}
+
+export async function setBoardBackground(
+  boardId: string,
+  userId: string,
+  isAdmin: boolean,
+  background: string | null
+) {
+  const isKnown = BOARD_BACKGROUNDS.some(({ key }) => key === background);
+  if (background !== null && !isKnown) throw new Error('Invalid background');
+  const { count } = await prisma.board.updateMany({
+    where: {
+      id: boardId,
+      archivedAt: null,
+      ...(!isAdmin && { ownerId: userId }),
+    },
+    data: { background },
+  });
+  if (count === 0) throw new Error('Board not found');
 }
 
 export async function addBoardMember(

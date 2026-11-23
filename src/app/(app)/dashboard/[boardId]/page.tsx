@@ -4,7 +4,7 @@ import { Board } from '@/components/features/board/Board';
 import { getBoard, listBoardMembers } from '@/services/boardService';
 import { listLabels } from '@/services/labelService';
 import { listPanels } from '@/services/panelService';
-import { requireSession } from '@/services/sessionService';
+import { isAdminEmail, requireSession } from '@/services/sessionService';
 import DashboardLoading from '../loading';
 
 async function BoardView({
@@ -28,6 +28,10 @@ async function BoardView({
     <Board
       boardId={board.id}
       boardName={board.name}
+      background={board.background}
+      canChangeBackground={
+        board.ownerId === user.id || isAdminEmail(user.email)
+      }
       panels={panels}
       users={users}
       labels={labels}
