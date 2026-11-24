@@ -33,6 +33,7 @@ export function ArchivePanelTasksDialog({
   const { isPending, runAction } = useSafeTransition();
   const cardLabel = taskCount === 1 ? 'cartão' : 'cartões';
   const verb = taskCount === 1 ? 'deixará' : 'deixarão';
+  const hasHiddenTasks = taskCount > panel.tasks.length;
 
   function confirm() {
     runAction(
@@ -52,7 +53,8 @@ export function ArchivePanelTasksDialog({
             Arquivar todos os cartões de &ldquo;{panel.name}&rdquo;?
           </DialogTitle>
           <DialogDescription>
-            {`${taskCount} ${cardLabel} ${verb} de aparecer no quadro. O painel continua.`}
+            {`${taskCount} ${cardLabel} ${verb} de aparecer no quadro e não será possível desfazer. O painel continua.`}
+            {hasHiddenTasks && ' Inclui cartões ocultos pelo filtro atual.'}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
