@@ -30,4 +30,9 @@ export const env = Object.freeze({
   GOOGLE_WORKSPACE_DOMAIN: readRequired('GOOGLE_WORKSPACE_DOMAIN'),
   ADMIN_EMAILS: readList('ADMIN_EMAILS'),
   APP_TIME_ZONE: readTimeZone('APP_TIME_ZONE'),
+  S3_ENDPOINT: readRequired('S3_ENDPOINT'),
+  S3_REGION: readRequired('S3_REGION'),
+  S3_BUCKET: readRequired('S3_BUCKET'),
+  S3_ACCESS_KEY_ID: readRequired('S3_ACCESS_KEY_ID'),
+  S3_SECRET_ACCESS_KEY: readRequired('S3_SECRET_ACCESS_KEY'),
 });

@@ -1,22 +1,45 @@
 import { randomUUID } from 'node:crypto';
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-import { UPLOADS_DIR } from '@/constants/storage';
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { env } from '@/config/env';
+
+const client = new S3Client({
+  endpoint: env.S3_ENDPOINT,
+  region: env.S3_REGION,
+  forcePathStyle: true,
+  credentials: {
+    accessKeyId: env.S3_ACCESS_KEY_ID,
+    secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+  },
+});
 
 export async function saveFile(file: File) {
   const storedName = randomUUID();
-  await mkdir(UPLOADS_DIR, { recursive: true });
-  await writeFile(
-    path.join(UPLOADS_DIR, storedName),
-    Buffer.from(await file.arrayBuffer())
+  await client.send(
+    new PutObjectCommand({
+      Bucket: env.S3_BUCKET,
+      Key: storedName,
+      Body: Buffer.from(await file.arrayBuffer()),
+      ContentType: file.type || undefined,
+    })
   );
   return storedName;
 }
 
 export async function readStoredFile(storedName: string) {
-  return readFile(path.join(UPLOADS_DIR, storedName));
+  const { Body } = await client.send(
+    new GetObjectCommand({ Bucket: env.S3_BUCKET, Key: storedName })
+  );
+  if (!Body) throw new Error(`Empty object: ${storedName}`);
+  return Buffer.from(await Body.transformToByteArray());
 }
 
 export async function removeStoredFile(storedName: string) {
-  await rm(path.join(UPLOADS_DIR, storedName), { force: true });
+  await client.send(
+    new DeleteObjectCommand({ Bucket: env.S3_BUCKET, Key: storedName })
+  );
 }
