@@ -15,6 +15,7 @@ import type { BoardLabel, BoardPanel, BoardUser } from '@/types/board';
 
 interface PanelColumnProps {
   panel: BoardPanel;
+  taskCount: number;
   users: BoardUser[];
   labels: BoardLabel[];
   onOpenTask: (taskId: string) => void;
@@ -22,6 +23,7 @@ interface PanelColumnProps {
 
 export function PanelColumn({
   panel,
+  taskCount,
   users,
   labels,
   onOpenTask,
@@ -51,6 +53,7 @@ export function PanelColumn({
     >
       <PanelHeader
         panel={panel}
+        taskCount={taskCount}
         dragHandleRef={setActivatorNodeRef}
         dragProps={{
           ...attributes,

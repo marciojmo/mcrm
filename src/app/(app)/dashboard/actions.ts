@@ -25,6 +25,7 @@ import {
   reorderPanels as reorderPanelRecords,
 } from '@/services/panelService';
 import {
+  archivePanelTasks as archivePanelTaskRecords,
   archiveTask as archiveTaskRecord,
   createTask as createTaskRecord,
   duplicateTask as duplicateTaskRecord,
@@ -148,6 +149,13 @@ export async function archivePanel(panelId: string) {
   const { user } = await requireSession();
   await assertPanelAccess(user.id, panelId);
   await archivePanelRecord(panelId);
+  revalidatePath('/dashboard', 'layout');
+}
+
+export async function archivePanelTasks(panelId: string) {
+  const { user } = await requireSession();
+  await assertPanelAccess(user.id, panelId);
+  await archivePanelTaskRecords(panelId);
   revalidatePath('/dashboard', 'layout');
 }
 

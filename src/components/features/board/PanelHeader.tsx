@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type HTMLAttributes } from 'react';
 import { MoreHorizontalIcon } from 'lucide-react';
 import { renamePanel } from '@/app/(app)/dashboard/actions';
 import { ArchivePanelDialog } from '@/components/features/board/ArchivePanelDialog';
+import { ArchivePanelTasksDialog } from '@/components/features/board/ArchivePanelTasksDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,20 +17,24 @@ import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface PanelHeaderProps {
   panel: BoardPanel;
+  taskCount: number;
   dragHandleRef: (element: HTMLElement | null) => void;
   dragProps: HTMLAttributes<HTMLDivElement>;
 }
 
 export function PanelHeader({
   panel,
+  taskCount,
   dragHandleRef,
   dragProps,
 }: PanelHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
+  const [isArchivingTasks, setIsArchivingTasks] = useState(false);
   const [name, setName] = useState(panel.name);
   const { isPending, runAction } = useSafeTransition();
   const nameButtonRef = useRef<HTMLButtonElement>(null);
+  const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const hasEdited = useRef(false);
 
   useEffect(() => {
@@ -92,12 +97,18 @@ export function PanelHeader({
         </span>
         <DropdownMenu>
           <DropdownMenuTrigger
+            ref={menuTriggerRef}
             aria-label="Menu do painel"
             className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none hover:bg-background focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             <MoreHorizontalIcon className="size-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-44">
+          <DropdownMenuContent align="end" className="w-52">
+            {taskCount > 0 && (
+              <DropdownMenuItem onClick={() => setIsArchivingTasks(true)}>
+                Arquivar todos os cartões
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => setIsArchiving(true)}>
               Arquivar painel
             </DropdownMenuItem>
@@ -108,6 +119,13 @@ export function PanelHeader({
         panel={panel}
         isOpen={isArchiving}
         onOpenChange={setIsArchiving}
+      />
+      <ArchivePanelTasksDialog
+        panel={panel}
+        taskCount={taskCount}
+        isOpen={isArchivingTasks}
+        onOpenChange={setIsArchivingTasks}
+        finalFocus={menuTriggerRef}
       />
     </>
   );
