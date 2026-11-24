@@ -126,6 +126,7 @@ export function Board({
           boardName={boardName}
           background={background}
           canChangeBackground={canChangeBackground}
+          hasBackground={Boolean(backgroundValue)}
         />
         <BoardFilters
           isOnlyMine={isOnlyMine}

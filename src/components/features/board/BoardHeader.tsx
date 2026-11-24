@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { BoardBackgroundPicker } from '@/components/features/board/BoardBackgroundPicker';
 import { BoardBreadcrumb } from '@/components/features/board/BoardBreadcrumb';
 import { buttonVariants } from '@/components/ui/Button';
-import { getBoardBackgroundValue } from '@/constants/boardBackgrounds';
 import { cn } from '@/lib/utils';
 
 interface BoardHeaderProps {
@@ -11,6 +10,7 @@ interface BoardHeaderProps {
   boardName: string;
   background: string | null;
   canChangeBackground: boolean;
+  hasBackground: boolean;
 }
 
 export function BoardHeader({
@@ -18,12 +18,15 @@ export function BoardHeader({
   boardName,
   background,
   canChangeBackground,
+  hasBackground,
 }: BoardHeaderProps) {
-  const hasBackground = Boolean(getBoardBackgroundValue(background));
   return (
     <div className="flex items-center justify-between gap-4 px-4 pt-4">
       <div
-        className={cn(hasBackground && 'rounded-lg bg-background px-3 py-1')}
+        className={cn(
+          'min-w-0',
+          hasBackground && 'flex h-9 items-center rounded-lg bg-background px-3'
+        )}
       >
         <BoardBreadcrumb boardId={boardId} boardName={boardName} />
       </div>

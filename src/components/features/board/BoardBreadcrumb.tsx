@@ -16,7 +16,7 @@ export function BoardBreadcrumb({
   return (
     <nav
       aria-label="Caminho"
-      className="flex items-center gap-1 text-sm text-muted-foreground"
+      className="flex min-w-0 items-center gap-1 text-sm text-muted-foreground"
     >
       <Link
         href="/dashboard"

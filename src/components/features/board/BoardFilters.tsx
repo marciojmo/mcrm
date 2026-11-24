@@ -24,7 +24,7 @@ export function BoardFilters({
   hasBackground,
 }: BoardFiltersProps) {
   return (
-    <div className="flex px-4 pt-3">
+    <div className="flex flex-wrap items-center gap-2 px-4 pt-3">
       <div
         className={cn(
           'flex items-center gap-2',
@@ -44,10 +44,16 @@ export function BoardFilters({
           selectedLabel={selectedLabel}
           onSelect={onSelectLabel}
         />
-        <p role="status" className="text-xs text-muted-foreground">
-          {isDragPaused && 'Reordenar está pausado enquanto há filtro ativo'}
-        </p>
       </div>
+      <p
+        role="status"
+        className={cn(
+          'text-xs text-muted-foreground',
+          hasBackground && isDragPaused && 'rounded-lg bg-background px-2 py-1'
+        )}
+      >
+        {isDragPaused && 'Reordenar está pausado enquanto há filtro ativo'}
+      </p>
     </div>
   );
 }
