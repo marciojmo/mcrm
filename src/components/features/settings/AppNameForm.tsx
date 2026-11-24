@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { saveAppName } from '@/app/(app)/settings/actions';
+import { saveAppName } from '@/app/(admin)/admin/settings/actions';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
