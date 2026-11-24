@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { EyeIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { closestCorners, DndContext, DragOverlay } from '@dnd-kit/core';
 import {
@@ -10,13 +9,12 @@ import {
 } from '@dnd-kit/sortable';
 import { createPanel } from '@/app/(app)/dashboard/actions';
 import { BoardAutoRefresh } from '@/components/features/board/BoardAutoRefresh';
+import { BoardFilters } from '@/components/features/board/BoardFilters';
 import { BoardHeader } from '@/components/features/board/BoardHeader';
-import { LabelFilter } from '@/components/features/board/LabelFilter';
 import { PanelColumn } from '@/components/features/board/PanelColumn';
 import { TaskDialog } from '@/components/features/board/TaskDialog';
 import { TaskCard } from '@/components/features/board/TaskCard';
 import { AddTextForm } from '@/components/ui/AddTextForm';
-import { Button } from '@/components/ui/Button';
 import { getBoardBackgroundValue } from '@/constants/boardBackgrounds';
 import {
   DRAG_ANNOUNCEMENTS,
@@ -119,64 +117,58 @@ export function Board({
       }}
     >
       <BoardAutoRefresh />
-      <BoardHeader
-        boardId={boardId}
-        boardName={boardName}
-        background={background}
-        canChangeBackground={canChangeBackground}
-      />
-      <div className="flex items-center gap-2 px-4 pt-3">
-        <Button
-          variant={isOnlyMine ? 'default' : 'outline'}
-          size="sm"
-          aria-pressed={isOnlyMine}
-          onClick={() => setIsOnlyMine((current) => !current)}
-        >
-          <EyeIcon /> Minhas tarefas
-        </Button>
-        <LabelFilter
+      <div
+        className="flex min-h-0 flex-1 flex-col"
+        style={{ background: backgroundValue }}
+      >
+        <BoardHeader
+          boardId={boardId}
+          boardName={boardName}
+          background={background}
+          canChangeBackground={canChangeBackground}
+          hasBackground={Boolean(backgroundValue)}
+        />
+        <BoardFilters
+          isOnlyMine={isOnlyMine}
+          onToggleOnlyMine={() => setIsOnlyMine((current) => !current)}
           labels={boardLabels}
           selectedLabel={
             labels.find((label) => label.id === filterLabelId) ?? null
           }
-          onSelect={setFilterLabelId}
+          onSelectLabel={setFilterLabelId}
+          isDragPaused={isDragPaused}
+          hasBackground={Boolean(backgroundValue)}
         />
-        <p role="status" className="text-xs text-muted-foreground">
-          {isDragPaused && 'Reordenar está pausado enquanto há filtro ativo'}
-        </p>
-      </div>
-      <div
-        className="flex flex-1 items-start gap-3 overflow-x-auto p-4"
-        style={{ background: backgroundValue }}
-      >
-        <SortableContext
-          items={panels.map((panel) => panel.id)}
-          strategy={horizontalListSortingStrategy}
-        >
-          {visiblePanels.map((panel) => (
-            <PanelColumn
-              key={panel.id}
-              panel={panel}
-              taskCount={
-                panels.find(({ id }) => id === panel.id)?.tasks.length ?? 0
-              }
-              users={users}
-              labels={labels}
-              onOpenTask={setOpenTaskId}
+        <div className="flex flex-1 items-start gap-3 overflow-x-auto p-4">
+          <SortableContext
+            items={panels.map((panel) => panel.id)}
+            strategy={horizontalListSortingStrategy}
+          >
+            {visiblePanels.map((panel) => (
+              <PanelColumn
+                key={panel.id}
+                panel={panel}
+                taskCount={
+                  panels.find(({ id }) => id === panel.id)?.tasks.length ?? 0
+                }
+                users={users}
+                labels={labels}
+                onOpenTask={setOpenTaskId}
+              />
+            ))}
+          </SortableContext>
+          <div
+            className={cn(
+              'w-72 shrink-0 rounded-xl p-2',
+              backgroundValue ? 'bg-muted' : 'bg-muted/60'
+            )}
+          >
+            <AddTextForm
+              addLabel="Adicionar painel"
+              placeholder="Nome do painel"
+              onSubmit={(name) => createPanel(boardId, name)}
             />
-          ))}
-        </SortableContext>
-        <div
-          className={cn(
-            'w-72 shrink-0 rounded-xl p-2',
-            backgroundValue ? 'bg-muted' : 'bg-muted/60'
-          )}
-        >
-          <AddTextForm
-            addLabel="Adicionar painel"
-            placeholder="Nome do painel"
-            onSubmit={(name) => createPanel(boardId, name)}
-          />
+          </div>
         </div>
       </div>
       <DragOverlay>
