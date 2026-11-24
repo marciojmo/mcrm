@@ -69,6 +69,20 @@ export async function archiveTask(taskId: string) {
   });
 }
 
+export async function archivePanelTasks(panelId: string) {
+  return prisma.$transaction(async (tx) => {
+    await lockPanels(tx, [panelId]);
+    await tx.panel.findUniqueOrThrow({
+      where: { id: panelId, archivedAt: null },
+      select: { id: true },
+    });
+    return tx.task.updateMany({
+      where: { panelId, archivedAt: null },
+      data: { archivedAt: new Date() },
+    });
+  });
+}
+
 export async function moveTask(
   taskId: string,
   targetPanelId: string,

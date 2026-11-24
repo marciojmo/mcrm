@@ -157,6 +157,9 @@ export function Board({
             <PanelColumn
               key={panel.id}
               panel={panel}
+              taskCount={
+                panels.find(({ id }) => id === panel.id)?.tasks.length ?? 0
+              }
               users={users}
               labels={labels}
               onOpenTask={setOpenTaskId}
