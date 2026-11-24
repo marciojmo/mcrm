@@ -17,14 +17,14 @@ const client = new S3Client({
   },
 });
 
-export async function saveFile(file: File) {
+export async function saveFile(file: File, contentType: string) {
   const storedName = randomUUID();
   await client.send(
     new PutObjectCommand({
       Bucket: env.S3_BUCKET,
       Key: storedName,
       Body: Buffer.from(await file.arrayBuffer()),
-      ContentType: file.type || undefined,
+      ContentType: contentType,
     })
   );
   return storedName;

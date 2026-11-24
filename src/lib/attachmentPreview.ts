@@ -1,4 +1,5 @@
 import type { TaskAttachment } from '@/types/task';
+import { sanitizeMimeType } from '@/lib/uploadPolicy';
 
 const IMAGE_EXTENSION = /\.(png|jpe?g|gif|webp|avif|svg)$/i;
 const DRIVE_FILE_ID = /\/d\/([\w-]+)/;
@@ -10,7 +11,7 @@ export function getDriveFileId(url: string) {
 
 export function getImageUrl(attachment: TaskAttachment) {
   if (!attachment.url) {
-    return attachment.mimeType?.startsWith('image/')
+    return sanitizeMimeType(attachment.mimeType).startsWith('image/')
       ? `/api/attachments/${attachment.id}`
       : null;
   }
