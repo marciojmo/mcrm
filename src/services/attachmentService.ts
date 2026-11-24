@@ -24,7 +24,7 @@ export async function addFileAttachment(taskId: string, file: File) {
       },
     });
   } catch (error) {
-    await removeStoredFile(storedName);
+    await removeStoredFile(storedName).catch(() => {});
     throw error;
   }
 }
