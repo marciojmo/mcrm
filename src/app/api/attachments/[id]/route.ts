@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { sanitizeMimeType } from '@/lib/uploadPolicy';
 import { getAttachment } from '@/services/attachmentService';
 import { assertAttachmentReadAccess } from '@/services/boardAccessService';
 import { readStoredFile } from '@/services/fileStorage';
@@ -24,8 +25,9 @@ export async function GET(
   }
   return new NextResponse(await readStoredFile(attachment.storedName), {
     headers: {
-      'Content-Type': attachment.mimeType ?? 'application/octet-stream',
+      'Content-Type': sanitizeMimeType(attachment.mimeType),
       'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(attachment.name)}`,
+      'X-Content-Type-Options': 'nosniff',
     },
   });
 }

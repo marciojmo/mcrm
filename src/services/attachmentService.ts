@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { sanitizeFileName, sanitizeMimeType } from '@/lib/uploadPolicy';
 import { removeStoredFile, saveFile } from '@/services/fileStorage';
 
 export async function addLinkAttachment(
@@ -10,16 +11,22 @@ export async function addLinkAttachment(
 }
 
 export async function addFileAttachment(taskId: string, file: File) {
-  const storedName = await saveFile(file);
-  return prisma.attachment.create({
-    data: {
-      taskId,
-      storedName,
-      name: file.name,
-      mimeType: file.type || null,
-      size: file.size,
-    },
-  });
+  const mimeType = sanitizeMimeType(file.type);
+  const storedName = await saveFile(file, mimeType);
+  try {
+    return await prisma.attachment.create({
+      data: {
+        taskId,
+        storedName,
+        name: sanitizeFileName(file.name),
+        mimeType,
+        size: file.size,
+      },
+    });
+  } catch (error) {
+    await removeStoredFile(storedName);
+    throw error;
+  }
 }
 
 export async function getAttachment(attachmentId: string) {
