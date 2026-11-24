@@ -2,19 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  BriefcaseIcon,
-  HomeIcon,
-  SettingsIcon,
-  ShieldIcon,
-} from 'lucide-react';
+import { BriefcaseIcon, HomeIcon, ShieldIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { BoardSummary } from '@/types/board';
 
 const NAV_ITEMS = [
   { href: '/home', label: 'Início', Icon: HomeIcon },
   { href: '/dashboard', label: 'Trabalho', Icon: BriefcaseIcon },
-  { href: '/settings', label: 'Configurações', Icon: SettingsIcon },
 ];
 
 export const NAV_ITEM_CLASS =

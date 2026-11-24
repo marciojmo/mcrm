@@ -2,7 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowLeftIcon, LayoutGridIcon, ShieldIcon } from 'lucide-react';
+import {
+  ArrowLeftIcon,
+  LayoutGridIcon,
+  SettingsIcon,
+  ShieldIcon,
+} from 'lucide-react';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { NAV_ACTIVE_CLASS, NAV_ITEM_CLASS } from '@/components/layouts/Sidebar';
 import { cn } from '@/lib/utils';
@@ -32,6 +37,17 @@ export function AdminSidebar({ collaborators }: AdminSidebarProps) {
         >
           <LayoutGridIcon className="size-4" />
           Visão geral
+        </Link>
+        <Link
+          href="/admin/settings"
+          aria-current={pathname === '/admin/settings' ? 'page' : undefined}
+          className={cn(
+            NAV_ITEM_CLASS,
+            pathname === '/admin/settings' && NAV_ACTIVE_CLASS
+          )}
+        >
+          <SettingsIcon className="size-4" />
+          Configurações
         </Link>
         <span className="mt-3 px-2 text-xs font-medium text-muted-foreground">
           Colaboradores
