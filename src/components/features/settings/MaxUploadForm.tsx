@@ -11,6 +11,7 @@ import {
   MIN_UPLOAD_MB,
 } from '@/constants/storage';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
+import { cn } from '@/lib/utils';
 
 interface MaxUploadFormProps {
   maxUploadBytes: number;
@@ -51,14 +52,24 @@ export function MaxUploadForm({ maxUploadBytes }: MaxUploadFormProps) {
         min={MIN_UPLOAD_MB}
         max={MAX_UPLOAD_MB}
         value={megabytes}
+        aria-invalid={!isValid}
+        aria-describedby="max-upload-hint"
         onChange={(event) => setMegabytes(event.target.value)}
       />
       <div className="flex items-center gap-2">
         <Button type="submit" size="sm" disabled={isPending || !isValid}>
           Salvar
         </Button>
-        <span className="text-xs text-muted-foreground">
-          Entre {MIN_UPLOAD_MB} e {MAX_UPLOAD_MB} MB
+        <span
+          id="max-upload-hint"
+          className={cn(
+            'text-xs',
+            isValid ? 'text-muted-foreground' : 'text-destructive'
+          )}
+        >
+          {isValid
+            ? `Entre ${MIN_UPLOAD_MB} e ${MAX_UPLOAD_MB} MB`
+            : `Informe um número inteiro entre ${MIN_UPLOAD_MB} e ${MAX_UPLOAD_MB} MB para salvar.`}
         </span>
       </div>
     </form>
