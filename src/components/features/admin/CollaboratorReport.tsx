@@ -19,7 +19,7 @@ export function CollaboratorReport({ report, today }: CollaboratorReportProps) {
   const { stats } = report;
 
   return (
-    <div className="flex flex-col gap-8 p-6">
+    <div className="flex flex-col gap-8">
       <div className="flex flex-wrap gap-3">
         <StatCard
           icon={CircleDotIcon}

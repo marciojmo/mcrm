@@ -16,10 +16,7 @@ export function AccountSection({
   isCurrentUser,
 }: AccountSectionProps) {
   return (
-    <section
-      aria-labelledby="account-title"
-      className="flex flex-col gap-5 border-b p-6"
-    >
+    <section aria-labelledby="account-title" className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center gap-3">
         <h2 id="account-title" className="text-base font-semibold">
           Conta

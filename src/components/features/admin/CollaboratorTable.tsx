@@ -41,7 +41,7 @@ export function CollaboratorTable({ collaborators }: CollaboratorTableProps) {
             <tr key={collaborator.id} className="border-t hover:bg-muted/40">
               <td className="px-3 py-2">
                 <Link
-                  href={`/admin/users/${collaborator.id}`}
+                  href={`/admin/metrics/${collaborator.id}`}
                   className="flex items-center gap-2"
                 >
                   <UserAvatar user={collaborator} isDecorative />

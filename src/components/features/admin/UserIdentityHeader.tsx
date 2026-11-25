@@ -8,13 +8,13 @@ interface UserIdentityHeaderProps {
 
 export function UserIdentityHeader({ report }: UserIdentityHeaderProps) {
   return (
-    <header className="flex items-center gap-4 px-6 pt-6">
+    <header className="flex items-center gap-4">
       <Avatar size="lg">
         <AvatarImage src={report.image ?? undefined} alt={report.name} />
         <AvatarFallback>{report.name.slice(0, 1)}</AvatarFallback>
       </Avatar>
       <div className="flex flex-col">
-        <h1 className="text-xl font-semibold">{report.name}</h1>
+        <p className="text-xl font-semibold">{report.name}</p>
         <p className="text-sm text-muted-foreground">
           {report.email} · desde {formatShortDate(report.joinedAt)} · último
           acesso{' '}
