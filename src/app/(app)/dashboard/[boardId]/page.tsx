@@ -5,7 +5,7 @@ import { getMaxUploadBytes } from '@/services/appSettingService';
 import { getBoard, listBoardMembers } from '@/services/boardService';
 import { listLabels } from '@/services/labelService';
 import { listPanels } from '@/services/panelService';
-import { isAdminEmail, requireSession } from '@/services/sessionService';
+import { isAdminUser, requireSession } from '@/services/sessionService';
 import DashboardLoading from '../loading';
 
 async function BoardView({
@@ -31,9 +31,7 @@ async function BoardView({
       boardId={board.id}
       boardName={board.name}
       background={board.background}
-      canChangeBackground={
-        board.ownerId === user.id || isAdminEmail(user.email)
-      }
+      canChangeBackground={board.ownerId === user.id || isAdminUser(user)}
       panels={panels}
       users={users}
       labels={labels}

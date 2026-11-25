@@ -12,13 +12,19 @@ export function GoogleSignInButton() {
     await authClient.signIn.social({
       provider: 'google',
       callbackURL: '/dashboard',
-      errorCallbackURL: '/?error=denied',
+      errorCallbackURL: '/',
     });
     setIsPending(false);
   }
 
   return (
-    <Button size="lg" className="w-full" onClick={signIn} disabled={isPending}>
+    <Button
+      variant="outline"
+      size="lg"
+      className="w-full"
+      onClick={signIn}
+      disabled={isPending}
+    >
       Continuar com o Google
     </Button>
   );

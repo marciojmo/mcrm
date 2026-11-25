@@ -36,17 +36,15 @@ cp .env.example .env
 
 Fill in `.env`:
 
-| Variable                  | Description                                                                 | Example                                              |
-| ------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------- |
-| `DATABASE_URL`            | PostgreSQL connection string                                                | `postgresql://postgres:postgres@localhost:5432/mcrm` |
-| `BETTER_AUTH_SECRET`      | Random secret used to sign sessions (`openssl rand -base64 32`)             | —                                                    |
-| `BETTER_AUTH_URL`         | Public URL of the app                                                       | `http://localhost:3100`                              |
-| `GOOGLE_CLIENT_ID`        | Google OAuth client ID                                                      | —                                                    |
-| `GOOGLE_CLIENT_SECRET`    | Google OAuth client secret                                                  | —                                                    |
-| `GOOGLE_WORKSPACE_DOMAIN` | Only accounts from this Google Workspace domain can sign in (without the @) | `example.com`                                        |
-| `ADMIN_EMAILS`            | Comma-separated e-mails that can open the God mode at `/admin` (optional)   | `ana@example.com,bob@example.com`                    |
+| Variable               | Description                                                     | Example                                              |
+| ---------------------- | --------------------------------------------------------------- | ---------------------------------------------------- |
+| `DATABASE_URL`         | PostgreSQL connection string                                    | `postgresql://postgres:postgres@localhost:5432/mcrm` |
+| `BETTER_AUTH_SECRET`   | Random secret used to sign sessions (`openssl rand -base64 32`) | —                                                    |
+| `BETTER_AUTH_URL`      | Public URL of the app                                           | `http://localhost:3100`                              |
+| `GOOGLE_CLIENT_ID`     | Google OAuth client ID                                          | —                                                    |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret                                      | —                                                    |
 
-All variables except `ADMIN_EMAILS` are required. The app fails on startup if one is missing.
+All variables are required. The app fails on startup if one is missing.
 
 ### 4. Apply the database migrations
 
@@ -60,11 +58,11 @@ npx prisma migrate deploy
 npm run dev
 ```
 
-Open [http://localhost:3100](http://localhost:3100) and sign in with your Google Workspace account. The first sign-in creates your user.
+Open [http://localhost:3100](http://localhost:3100) and sign in with the first admin created by `npm run create-admin -- <email> <name> <password>`. Admins create other users (with a password) at `/admin/users`; users can also sign in with Google and link it to their account.
 
 ## Google sign-in
 
-MCRM only supports Google Workspace sign-in. To create the credentials:
+Any Google account can sign in. To create the credentials:
 
 1. In the [Google Cloud Console](https://console.cloud.google.com/apis/credentials), create an **OAuth client ID** of type **Web application**.
 2. Add this **Authorized redirect URI** (replace the host with your `BETTER_AUTH_URL`):
@@ -74,7 +72,6 @@ MCRM only supports Google Workspace sign-in. To create the credentials:
    ```
 
 3. Copy the client ID and secret into `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
-4. Set `GOOGLE_WORKSPACE_DOMAIN` to your organization's domain.
 
 ## 🌟 Features
 

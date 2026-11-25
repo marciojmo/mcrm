@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { MAX_DESCRIPTION_LENGTH } from '@/constants/task';
 import type { TaskDetails } from '@/types/board';
-import { isAdminEmail, requireSession } from '@/services/sessionService';
+import { isAdminUser, requireSession } from '@/services/sessionService';
 import {
   addBoardMember as addBoardMemberRecord,
   archiveBoard as archiveBoardRecord,
@@ -81,7 +81,7 @@ export async function setBoardBackground(
   await setBoardBackgroundRecord(
     boardId,
     user.id,
-    isAdminEmail(user.email),
+    isAdminUser(user),
     background
   );
   revalidatePath('/dashboard', 'layout');

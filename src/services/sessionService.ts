@@ -1,6 +1,5 @@
 import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
-import { env } from '@/config/env';
 import { auth } from '@/lib/auth';
 
 export async function getSession() {
@@ -13,12 +12,12 @@ export async function requireSession() {
   return session;
 }
 
-export function isAdminEmail(email: string) {
-  return env.ADMIN_EMAILS.includes(email.toLowerCase());
+export function isAdminUser(user: { role?: string | null }) {
+  return user.role === 'admin';
 }
 
 export async function requireAdmin() {
   const session = await requireSession();
-  if (!isAdminEmail(session.user.email)) notFound();
+  if (!isAdminUser(session.user)) notFound();
   return session;
 }
