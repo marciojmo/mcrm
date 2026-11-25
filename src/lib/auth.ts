@@ -16,8 +16,6 @@ export const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
-  account: {
-    accountLinking: { enabled: true, trustedProviders: ['google'] },
-  },
+  account: { accountLinking: { enabled: true } },
   plugins: [admin(), nextCookies()],
 });

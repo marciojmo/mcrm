@@ -12,6 +12,11 @@ if (password.length < 8) {
   process.exit(1);
 }
 
+if (!process.env.DATABASE_URL) {
+  console.error('DATABASE_URL is not set. Add it to .env or the environment.');
+  process.exit(1);
+}
+
 const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
 await client.connect();
 try {

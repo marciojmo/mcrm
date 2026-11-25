@@ -12,6 +12,8 @@ import {
 import { getAppName } from '@/services/appSettingService';
 import { getSession } from '@/services/sessionService';
 
+const ACCOUNT_NOT_LINKED_ERROR = 'account_not_linked';
+
 async function SignInError({
   searchParams,
 }: {
@@ -21,7 +23,9 @@ async function SignInError({
   if (!error) return null;
   return (
     <p role="alert" className="text-sm text-destructive">
-      Não foi possível entrar com o Google. Tente novamente.
+      {error === ACCOUNT_NOT_LINKED_ERROR
+        ? 'Esta conta já existe com senha. Entre com e-mail e senha e vincule o Google pelo menu do usuário.'
+        : 'Não foi possível entrar com o Google. Tente novamente.'}
     </p>
   );
 }
@@ -51,7 +55,11 @@ export default function Home({ searchParams }: PageProps<'/'>) {
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <EmailSignInForm />
-          <p className="text-center text-xs text-muted-foreground">ou</p>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="h-px flex-1 bg-border" />
+            ou
+            <span className="h-px flex-1 bg-border" />
+          </div>
           <GoogleSignInButton />
           <Suspense>
             <SignInError searchParams={searchParams} />

@@ -1,6 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import {
   DropdownMenu,
@@ -11,7 +12,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu';
+import { useToast } from '@/components/ui/Toast';
 import { authClient } from '@/lib/authClient';
+
+const LINKED_PARAM = 'linked';
+const LINK_ERROR_PARAM = 'linkError';
 
 interface UserMenuProps {
   name: string;
@@ -27,6 +32,22 @@ export function UserMenu({
   isGoogleLinked,
 }: UserMenuProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const toast = useToast();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has(LINKED_PARAM))
+      toast.add({ title: 'Conta Google vinculada.' });
+    else if (params.has(LINK_ERROR_PARAM))
+      toast.add({
+        title:
+          'Não foi possível vincular. Use uma conta Google com o mesmo e-mail do seu cadastro.',
+        priority: 'high',
+      });
+    else return;
+    router.replace(pathname);
+  }, [pathname, router, toast]);
 
   async function signOut() {
     await authClient.signOut();
@@ -36,7 +57,8 @@ export function UserMenu({
   function linkGoogle() {
     authClient.linkSocial({
       provider: 'google',
-      callbackURL: window.location.pathname,
+      callbackURL: `${pathname}?${LINKED_PARAM}=1`,
+      errorCallbackURL: `${pathname}?${LINK_ERROR_PARAM}=1`,
     });
   }
 

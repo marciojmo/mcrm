@@ -22,14 +22,18 @@ interface UserAccountRowProps {
 
 export function UserAccountRow({ user, isCurrentUser }: UserAccountRowProps) {
   const [password, setPassword] = useState('');
+  const [pendingRole, setPendingRole] = useState<UserRole | null>(null);
   const { isPending, runAction } = useSafeTransition();
   const toast = useToast();
 
-  function changeRole(role: UserRole) {
-    runAction(async () => {
-      await changeUserRole(user.id, role);
-      toast.add({ title: 'Papel atualizado.' });
-    });
+  async function confirmRole() {
+    if (!pendingRole) return;
+    const isChanged = await runAction(() =>
+      changeUserRole(user.id, pendingRole)
+    );
+    if (!isChanged) return;
+    setPendingRole(null);
+    toast.add({ title: 'Papel atualizado.' });
   }
 
   async function resetPassword(event: React.FormEvent) {
@@ -57,16 +61,47 @@ export function UserAccountRow({ user, isCurrentUser }: UserAccountRowProps) {
         </Link>
       </td>
       <td className="px-3 py-2">
-        <select
-          aria-label={`Papel de ${user.name}`}
-          className={ROLE_SELECT_CLASS}
-          value={user.role}
-          disabled={isPending || isCurrentUser}
-          onChange={(event) => changeRole(event.target.value as UserRole)}
-        >
-          <option value="user">Usuário</option>
-          <option value="admin">Administrador</option>
-        </select>
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            aria-label={`Papel de ${user.name}`}
+            title={
+              isCurrentUser
+                ? 'Você não pode alterar o próprio papel'
+                : undefined
+            }
+            className={ROLE_SELECT_CLASS}
+            value={pendingRole ?? user.role}
+            disabled={isPending || isCurrentUser}
+            onChange={(event) =>
+              setPendingRole(
+                event.target.value === user.role
+                  ? null
+                  : (event.target.value as UserRole)
+              )
+            }
+          >
+            <option value="user">Usuário</option>
+            <option value="admin">Administrador</option>
+          </select>
+          {isCurrentUser && (
+            <span className="text-xs text-muted-foreground">(você)</span>
+          )}
+          {pendingRole && (
+            <>
+              <Button size="sm" disabled={isPending} onClick={confirmRole}>
+                Confirmar
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={isPending}
+                onClick={() => setPendingRole(null)}
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
+        </div>
       </td>
       <td className="px-3 py-2 text-muted-foreground">
         {user.isGoogleLinked ? 'Vinculado' : '—'}
@@ -78,10 +113,10 @@ export function UserAccountRow({ user, isCurrentUser }: UserAccountRowProps) {
             type="password"
             autoComplete="new-password"
             aria-label={`Nova senha de ${user.name}`}
-            placeholder="Nova senha"
+            placeholder={`Nova senha (mín. ${MIN_PASSWORD_LENGTH})`}
             minLength={MIN_PASSWORD_LENGTH}
             maxLength={MAX_PASSWORD_LENGTH}
-            className="w-40"
+            className="w-48"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />

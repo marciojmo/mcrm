@@ -40,13 +40,14 @@ export async function createUser(input: {
   role: UserRole;
 }) {
   await requireAdmin();
-  await createAccountUser({
+  const result = await createAccountUser({
     name: cleanText(input.name),
     email: cleanText(input.email),
     password: cleanPassword(input.password),
     role: cleanRole(input.role),
   });
   revalidatePath('/admin', 'layout');
+  return result;
 }
 
 export async function resetUserPassword(userId: string, password: string) {

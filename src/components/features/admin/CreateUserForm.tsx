@@ -20,14 +20,18 @@ export function CreateUserForm() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    let isEmailTaken = false;
     const isCreated = await runAction(
-      () => createUser({ name, email, password, role }),
-      {
-        errorMessage:
-          'Não foi possível criar o usuário. Verifique se o e-mail já está em uso.',
-      }
+      async () => {
+        ({ isEmailTaken } = await createUser({ name, email, password, role }));
+      },
+      { errorMessage: 'Não foi possível criar o usuário. Tente novamente.' }
     );
     if (!isCreated) return;
+    if (isEmailTaken) {
+      toast.add({ title: 'Este e-mail já está em uso.', priority: 'high' });
+      return;
+    }
     setName('');
     setEmail('');
     setPassword('');
@@ -36,51 +40,68 @@ export function CreateUserForm() {
   }
 
   return (
-    <form
-      onSubmit={submit}
-      aria-label="Criar usuário"
-      className="grid max-w-3xl gap-3 sm:grid-cols-2"
-    >
-      <Input
-        required
-        aria-label="Nome"
-        placeholder="Nome"
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-      />
-      <Input
-        required
-        type="email"
-        aria-label="E-mail"
-        placeholder="E-mail"
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
-      />
-      <Input
-        required
-        type="password"
-        autoComplete="new-password"
-        aria-label="Senha inicial"
-        placeholder={`Senha inicial (mín. ${MIN_PASSWORD_LENGTH} caracteres)`}
-        minLength={MIN_PASSWORD_LENGTH}
-        maxLength={MAX_PASSWORD_LENGTH}
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-      />
-      <select
-        aria-label="Papel"
-        className={ROLE_SELECT_CLASS}
-        value={role}
-        onChange={(event) => setRole(event.target.value as UserRole)}
-      >
-        <option value="user">Usuário</option>
-        <option value="admin">Administrador</option>
-      </select>
-      <div>
-        <Button type="submit" disabled={isPending}>
-          Criar usuário
-        </Button>
-      </div>
-    </form>
+    <section className="flex flex-col gap-3">
+      <h2 className="text-base font-semibold">Novo usuário</h2>
+      <form onSubmit={submit} className="grid max-w-3xl gap-3 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="new-user-name" className="text-sm font-medium">
+            Nome
+          </label>
+          <Input
+            id="new-user-name"
+            required
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="new-user-email" className="text-sm font-medium">
+            E-mail
+          </label>
+          <Input
+            id="new-user-email"
+            required
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="new-user-password" className="text-sm font-medium">
+            Senha inicial
+          </label>
+          <Input
+            id="new-user-password"
+            required
+            type="password"
+            autoComplete="new-password"
+            placeholder={`Mínimo de ${MIN_PASSWORD_LENGTH} caracteres`}
+            minLength={MIN_PASSWORD_LENGTH}
+            maxLength={MAX_PASSWORD_LENGTH}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="new-user-role" className="text-sm font-medium">
+            Papel
+          </label>
+          <select
+            id="new-user-role"
+            className={ROLE_SELECT_CLASS}
+            value={role}
+            onChange={(event) => setRole(event.target.value as UserRole)}
+          >
+            <option value="user">Usuário</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div>
+          <Button type="submit" disabled={isPending}>
+            Criar usuário
+          </Button>
+        </div>
+      </form>
+    </section>
   );
 }
