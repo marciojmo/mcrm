@@ -3,14 +3,16 @@ import {
   FALLBACK_MIME_TYPE,
   MAX_FILE_NAME_LENGTH,
   MAX_MULTIPART_OVERHEAD_BYTES,
-  MAX_UPLOAD_BYTES,
 } from '@/constants/storage';
 
 const MAX_EXTENSION_LENGTH = 16;
 
-export function isContentLengthAllowed(header: string | null) {
+export function isContentLengthAllowed(
+  header: string | null,
+  maxUploadBytes: number
+) {
   if (!header || !/^\d+$/.test(header)) return false;
-  return Number(header) <= MAX_UPLOAD_BYTES + MAX_MULTIPART_OVERHEAD_BYTES;
+  return Number(header) <= maxUploadBytes + MAX_MULTIPART_OVERHEAD_BYTES;
 }
 
 export function sanitizeMimeType(mimeType: string | null | undefined) {

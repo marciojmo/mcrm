@@ -1,4 +1,7 @@
-export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+export const BYTES_PER_MB = 1024 * 1024;
+export const DEFAULT_MAX_UPLOAD_BYTES = 10 * BYTES_PER_MB;
+export const MIN_UPLOAD_MB = 1;
+export const MAX_UPLOAD_MB = 50;
 export const MAX_MULTIPART_OVERHEAD_BYTES = 64 * 1024;
 export const MAX_FILE_NAME_LENGTH = 255;
 export const FALLBACK_MIME_TYPE = 'application/octet-stream';

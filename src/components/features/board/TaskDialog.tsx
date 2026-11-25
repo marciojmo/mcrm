@@ -29,6 +29,7 @@ interface TaskDialogProps {
   task: BoardTask;
   users: BoardUser[];
   labels: BoardLabel[];
+  maxUploadBytes: number;
   currentUserId: string;
   highlightCommentId: string | null;
   onClose: () => void;
@@ -40,6 +41,7 @@ export function TaskDialog({
   task,
   users,
   labels,
+  maxUploadBytes,
   currentUserId,
   highlightCommentId,
   onClose,
@@ -87,7 +89,11 @@ export function TaskDialog({
               checklistCount={extras?.checklists.length ?? 0}
               onChange={reload}
             />
-            <AddAttachmentPopover taskId={task.id} onChange={reload} />
+            <AddAttachmentPopover
+              taskId={task.id}
+              maxUploadBytes={maxUploadBytes}
+              onChange={reload}
+            />
             <DueDateField
               value={details.dueDate}
               onChange={(dueDate) => saveField({ dueDate })}

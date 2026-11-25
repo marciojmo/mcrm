@@ -236,9 +236,10 @@ model Attachment {
 }
 
 model AppSetting {
-  id        String   @id @default("app")
-  appName   String   @default("MCRM") @map("app_name") @db.VarChar(40)
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id             String   @id @default("app")
+  appName        String   @default("MCRM") @map("app_name") @db.VarChar(40)
+  maxUploadBytes Int      @default(10485760) @map("max_upload_bytes")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   @@map("app_settings")
 }

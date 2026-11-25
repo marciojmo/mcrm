@@ -1,7 +1,7 @@
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
-import { MAX_UPLOAD_BYTES } from '@/constants/storage';
 import { isContentLengthAllowed } from '@/lib/uploadPolicy';
+import { getMaxUploadBytes } from '@/services/appSettingService';
 import { addFileAttachment } from '@/services/attachmentService';
 import { assertTaskAccess } from '@/services/boardAccessService';
 import { getSession } from '@/services/sessionService';
@@ -11,7 +11,13 @@ export async function POST(request: Request) {
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  if (!isContentLengthAllowed(request.headers.get('content-length'))) {
+  const maxUploadBytes = await getMaxUploadBytes();
+  if (
+    !isContentLengthAllowed(
+      request.headers.get('content-length'),
+      maxUploadBytes
+    )
+  ) {
     return NextResponse.json({ error: 'File too large' }, { status: 413 });
   }
   const form = await request.formData();
@@ -25,7 +31,7 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
-  if (file.size > MAX_UPLOAD_BYTES) {
+  if (file.size > maxUploadBytes) {
     return NextResponse.json({ error: 'File too large' }, { status: 413 });
   }
   await addFileAttachment(taskId, file);
