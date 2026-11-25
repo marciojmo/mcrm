@@ -60,8 +60,9 @@ export async function resetUserPassword(userId: string, password: string) {
 
 export async function changeUserRole(userId: string, role: UserRole) {
   const { user } = await requireAdmin();
-  if (userId === user.id) throw new Error('Cannot change own role');
-  await changeUserRoleRecord(cleanText(userId), cleanRole(role));
+  const id = cleanText(userId);
+  if (id === user.id) throw new Error('Cannot change own role');
+  await changeUserRoleRecord(id, cleanRole(role));
   revalidatePath('/admin', 'layout');
 }
 
@@ -80,8 +81,9 @@ export async function updateUserProfile(
 
 export async function deactivateUser(userId: string) {
   const { user } = await requireAdmin();
-  if (userId === user.id) throw new Error('Cannot deactivate yourself');
-  await deactivateUserRecord(cleanText(userId));
+  const id = cleanText(userId);
+  if (id === user.id) throw new Error('Cannot deactivate yourself');
+  await deactivateUserRecord(id);
   revalidatePath('/admin', 'layout');
 }
 

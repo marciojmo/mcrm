@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   deactivateUser,
   reactivateUser,
@@ -33,42 +33,55 @@ export function AccountStatusControl({
   const [isOpen, setIsOpen] = useState(false);
   const { isPending, runAction } = useSafeTransition();
   const toast = useToast();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const hasToggled = useRef(false);
+
+  useEffect(() => {
+    if (hasToggled.current) buttonRef.current?.focus();
+  }, [isBanned]);
 
   async function deactivate() {
     const isDone = await runAction(() => deactivateUser(userId));
     if (!isDone) return;
+    hasToggled.current = true;
     setIsOpen(false);
     toast.add({ title: 'Usuário desativado.' });
   }
 
   async function reactivate() {
     const isDone = await runAction(() => reactivateUser(userId));
-    if (isDone) toast.add({ title: 'Usuário reativado.' });
+    if (!isDone) return;
+    hasToggled.current = true;
+    toast.add({ title: 'Usuário reativado.' });
   }
 
   return (
     <div className="flex flex-col gap-1.5">
       {isBanned ? (
         <Button
+          ref={buttonRef}
           variant="outline"
           className="self-start"
           disabled={isPending}
+          aria-busy={isPending}
           onClick={reactivate}
         >
-          Reativar usuário
+          {isPending ? 'Reativando…' : 'Reativar usuário'}
         </Button>
       ) : (
         <Button
+          ref={buttonRef}
           variant="destructive"
           className="self-start"
           disabled={isCurrentUser}
+          aria-describedby={isCurrentUser ? 'status-hint' : undefined}
           onClick={() => setIsOpen(true)}
         >
           Desativar usuário
         </Button>
       )}
       {isCurrentUser && (
-        <p className="text-xs text-muted-foreground">
+        <p id="status-hint" className="text-xs text-muted-foreground">
           Você não pode desativar a própria conta.
         </p>
       )}

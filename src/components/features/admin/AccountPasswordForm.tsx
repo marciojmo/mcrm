@@ -36,7 +36,7 @@ export function AccountPasswordForm({ userId }: AccountPasswordFormProps) {
           required
           type="password"
           autoComplete="new-password"
-          placeholder={`Mínimo de ${MIN_PASSWORD_LENGTH} caracteres`}
+          placeholder={`Mín. ${MIN_PASSWORD_LENGTH} caracteres`}
           minLength={MIN_PASSWORD_LENGTH}
           maxLength={MAX_PASSWORD_LENGTH}
           value={password}

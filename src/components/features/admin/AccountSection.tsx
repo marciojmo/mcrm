@@ -41,6 +41,7 @@ export function AccountSection({
         userId={account.id}
         name={account.name}
         email={account.email}
+        isGoogleLinked={account.isGoogleLinked}
       />
       <AccountRoleControl
         key={account.role}

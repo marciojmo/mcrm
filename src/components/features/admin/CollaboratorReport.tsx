@@ -7,8 +7,6 @@ import {
 } from 'lucide-react';
 import { CollaboratorTaskList } from '@/components/features/admin/CollaboratorTaskList';
 import { StatCard } from '@/components/features/home/StatCard';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
-import { formatShortDate } from '@/lib/formatShortDate';
 import { cn } from '@/lib/utils';
 import type { CollaboratorReport as Report } from '@/types/admin';
 
@@ -22,21 +20,6 @@ export function CollaboratorReport({ report, today }: CollaboratorReportProps) {
 
   return (
     <div className="flex flex-col gap-8 p-6">
-      <header className="flex items-center gap-4">
-        <Avatar size="lg">
-          <AvatarImage src={report.image ?? undefined} alt={report.name} />
-          <AvatarFallback>{report.name.slice(0, 1)}</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col">
-          <h1 className="text-xl font-semibold">{report.name}</h1>
-          <p className="text-sm text-muted-foreground">
-            {report.email} · desde {formatShortDate(report.joinedAt)} · último
-            acesso{' '}
-            {report.lastSeenAt ? formatShortDate(report.lastSeenAt) : 'nunca'}
-          </p>
-        </div>
-      </header>
-
       <div className="flex flex-wrap gap-3">
         <StatCard
           icon={CircleDotIcon}

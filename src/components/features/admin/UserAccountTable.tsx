@@ -25,13 +25,7 @@ export function UserAccountTable({ users }: UserAccountTableProps) {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr
-              key={user.id}
-              className={cn(
-                'border-t hover:bg-muted/40',
-                user.isBanned && 'opacity-60'
-              )}
-            >
+            <tr key={user.id} className="border-t">
               <td className="px-3 py-2">
                 <Link
                   href={`/admin/users/${user.id}`}
@@ -39,7 +33,14 @@ export function UserAccountTable({ users }: UserAccountTableProps) {
                 >
                   <UserAvatar user={user} isDecorative />
                   <span className="flex min-w-0 flex-col">
-                    <span className="truncate font-medium">{user.name}</span>
+                    <span
+                      className={cn(
+                        'truncate font-medium',
+                        user.isBanned && 'text-muted-foreground'
+                      )}
+                    >
+                      {user.name}
+                    </span>
                     <span className="truncate text-xs text-muted-foreground">
                       {user.email}
                     </span>

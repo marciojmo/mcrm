@@ -3,6 +3,7 @@ import { env } from '@/config/env';
 import { getToday } from '@/lib/appTime';
 import { notFound } from 'next/navigation';
 import { AccountSection } from '@/components/features/admin/AccountSection';
+import { UserIdentityHeader } from '@/components/features/admin/UserIdentityHeader';
 import { CollaboratorReport } from '@/components/features/admin/CollaboratorReport';
 import { getCollaboratorReport } from '@/services/adminService';
 import { getAccountUser } from '@/services/accountUserService';
@@ -24,6 +25,7 @@ async function Details({
   if (!account || !report) notFound();
   return (
     <>
+      <UserIdentityHeader report={report} />
       <AccountSection
         account={account}
         isCurrentUser={account.id === user.id}

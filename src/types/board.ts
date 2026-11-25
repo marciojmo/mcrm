@@ -2,6 +2,7 @@ export interface BoardUser {
   id: string;
   name: string;
   image: string | null;
+  isBanned?: boolean;
 }
 
 export interface BoardLabel {

@@ -40,6 +40,9 @@ export function EmailSignInForm() {
     router.push('/dashboard');
   }
 
+  const isInvalid =
+    errorMessage !== null && errorMessage !== DEACTIVATED_MESSAGE;
+
   return (
     <form onSubmit={signIn} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
@@ -51,7 +54,7 @@ export function EmailSignInForm() {
           required
           type="email"
           autoComplete="email"
-          aria-invalid={errorMessage ? true : undefined}
+          aria-invalid={isInvalid ? true : undefined}
           aria-describedby={errorMessage ? 'sign-in-error' : undefined}
           value={email}
           onChange={(event) => setEmail(event.target.value)}
@@ -66,7 +69,7 @@ export function EmailSignInForm() {
           required
           type="password"
           autoComplete="current-password"
-          aria-invalid={errorMessage ? true : undefined}
+          aria-invalid={isInvalid ? true : undefined}
           aria-describedby={errorMessage ? 'sign-in-error' : undefined}
           value={password}
           onChange={(event) => setPassword(event.target.value)}

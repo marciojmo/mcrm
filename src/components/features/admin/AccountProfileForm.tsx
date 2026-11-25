@@ -11,12 +11,14 @@ interface AccountProfileFormProps {
   userId: string;
   name: string;
   email: string;
+  isGoogleLinked: boolean;
 }
 
 export function AccountProfileForm({
   userId,
   name: initialName,
   email: initialEmail,
+  isGoogleLinked,
 }: AccountProfileFormProps) {
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
@@ -64,8 +66,16 @@ export function AccountProfileForm({
           aria-invalid={isEmailTaken ? true : undefined}
           aria-describedby={isEmailTaken ? 'account-email-error' : undefined}
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(event) => {
+            setEmail(event.target.value);
+            setIsEmailTaken(false);
+          }}
         />
+        {isGoogleLinked && (
+          <p className="text-xs text-muted-foreground">
+            A conta Google vinculada continua vinculada após a troca de e-mail.
+          </p>
+        )}
         {isEmailTaken && (
           <p
             id="account-email-error"

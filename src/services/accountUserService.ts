@@ -80,7 +80,10 @@ export async function createAccountUser(input: {
   role: UserRole;
 }) {
   return runCatchingEmailTaken(async () =>
-    auth.api.createUser({ headers: await headers(), body: input })
+    auth.api.createUser({
+      headers: await headers(),
+      body: { ...input, data: { emailVerified: true } },
+    })
   );
 }
 

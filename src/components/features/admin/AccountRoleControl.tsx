@@ -44,6 +44,7 @@ export function AccountRoleControl({
           className={ROLE_SELECT_CLASS}
           value={pendingRole ?? role}
           disabled={isPending || isCurrentUser}
+          aria-describedby={isCurrentUser ? 'role-hint' : undefined}
           onChange={(event) =>
             setPendingRole(
               event.target.value === role
@@ -72,7 +73,7 @@ export function AccountRoleControl({
         )}
       </div>
       {isCurrentUser && (
-        <p className="text-xs text-muted-foreground">
+        <p id="role-hint" className="text-xs text-muted-foreground">
           Você não pode alterar o próprio papel.
         </p>
       )}

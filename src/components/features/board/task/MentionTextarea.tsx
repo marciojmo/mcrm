@@ -46,8 +46,10 @@ export function MentionTextarea({
     dismissedAt === queryStart
       ? []
       : users
-          .filter((user) =>
-            user.name.toLowerCase().includes(query.trim().toLowerCase())
+          .filter(
+            (user) =>
+              !user.isBanned &&
+              user.name.toLowerCase().includes(query.trim().toLowerCase())
           )
           .slice(0, 5);
 
