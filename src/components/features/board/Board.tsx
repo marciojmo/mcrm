@@ -35,6 +35,7 @@ interface BoardProps {
   panels: BoardPanel[];
   users: BoardUser[];
   labels: BoardLabel[];
+  maxUploadBytes: number;
   currentUserId: string;
   initialTaskId: string | null;
   highlightCommentId: string | null;
@@ -48,6 +49,7 @@ export function Board({
   panels: serverPanels,
   users,
   labels,
+  maxUploadBytes,
   currentUserId,
   initialTaskId,
   highlightCommentId,
@@ -183,6 +185,7 @@ export function Board({
           task={openTask}
           users={users}
           labels={labels}
+          maxUploadBytes={maxUploadBytes}
           currentUserId={currentUserId}
           highlightCommentId={highlightCommentId}
           onClose={() => setOpenTaskId(null)}

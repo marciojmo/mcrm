@@ -11,11 +11,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/Popover';
-import { MAX_UPLOAD_BYTES } from '@/constants/storage';
+import { BYTES_PER_MB } from '@/constants/storage';
 import { useSafeTransition } from '@/hooks/useSafeTransition';
 
 interface AddAttachmentPopoverProps {
   taskId: string;
+  maxUploadBytes: number;
   onChange: () => Promise<void>;
 }
 
@@ -25,6 +26,7 @@ function isHttpUrl(value: string) {
 
 export function AddAttachmentPopover({
   taskId,
+  maxUploadBytes,
   onChange,
 }: AddAttachmentPopoverProps) {
   const router = useRouter();
@@ -43,8 +45,8 @@ export function AddAttachmentPopover({
   }
 
   function upload(file: File) {
-    if (file.size > MAX_UPLOAD_BYTES) {
-      setError('Arquivo maior que 10 MB.');
+    if (file.size > maxUploadBytes) {
+      setError(`Arquivo maior que ${maxUploadBytes / BYTES_PER_MB} MB.`);
       return;
     }
     runAction(async () => {
