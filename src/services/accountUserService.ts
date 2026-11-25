@@ -39,7 +39,10 @@ export async function createAccountUser(input: {
   role: UserRole;
 }) {
   try {
-    await auth.api.createUser({ headers: await headers(), body: input });
+    await auth.api.createUser({
+      headers: await headers(),
+      body: { ...input, data: { emailVerified: true } },
+    });
     return { isEmailTaken: false };
   } catch (error) {
     const code = isAPIError(error) ? error.body?.code : null;

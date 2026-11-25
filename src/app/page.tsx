@@ -13,6 +13,7 @@ import { getAppName } from '@/services/appSettingService';
 import { getSession } from '@/services/sessionService';
 
 const ACCOUNT_NOT_LINKED_ERROR = 'account_not_linked';
+const SIGN_UP_DISABLED_ERROR = 'signup_disabled';
 
 async function SignInError({
   searchParams,
@@ -21,6 +22,7 @@ async function SignInError({
 }) {
   const { error } = await searchParams;
   if (!error) return null;
+  if (error === SIGN_UP_DISABLED_ERROR) redirect('/unauthorized');
   return (
     <p role="alert" className="text-sm text-destructive">
       {error === ACCOUNT_NOT_LINKED_ERROR
