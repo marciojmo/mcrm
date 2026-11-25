@@ -23,6 +23,7 @@ async function filterBoardUserIds(taskId: string, userIds: string[]) {
   const users = await prisma.user.findMany({
     where: {
       id: { in: userIds },
+      banned: false,
       OR: [
         { boards: { some: board } },
         { boardMemberships: { some: { board } } },

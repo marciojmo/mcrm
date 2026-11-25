@@ -27,6 +27,7 @@ export async function listCollaborators(
   today: string
 ): Promise<CollaboratorSummary[]> {
   const users = await prisma.user.findMany({
+    where: { banned: false },
     orderBy: { name: 'asc' },
     select: {
       id: true,

@@ -9,6 +9,7 @@ const MAX_TOP_SCORERS = 3;
 
 async function getTeamScores(today: string) {
   const users = await prisma.user.findMany({
+    where: { banned: false },
     select: {
       id: true,
       name: true,

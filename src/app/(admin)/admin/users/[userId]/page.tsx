@@ -1,31 +1,39 @@
 import { Suspense } from 'react';
-import { env } from '@/config/env';
-import { getToday } from '@/lib/appTime';
 import { notFound } from 'next/navigation';
-import { CollaboratorReport } from '@/components/features/admin/CollaboratorReport';
-import { getCollaboratorReport } from '@/services/adminService';
+import { AdminPage } from '@/components/layouts/AdminPage';
+import { AccountSection } from '@/components/features/admin/AccountSection';
+import { getAccountUser } from '@/services/accountUserService';
 import { requireAdmin } from '@/services/sessionService';
-import AdminLoading from '../../loading';
+import UsersLoading from '../loading';
 
-async function Report({
+async function Details({
   params,
 }: {
   params: PageProps<'/admin/users/[userId]'>['params'];
 }) {
   const { userId } = await params;
-  await requireAdmin();
-  const today = getToday(env.APP_TIME_ZONE);
-  const report = await getCollaboratorReport(userId, today);
-  if (!report) notFound();
-  return <CollaboratorReport report={report} today={today} />;
+  const { user } = await requireAdmin();
+  const account = await getAccountUser(userId);
+  if (!account) notFound();
+  return (
+    <AdminPage
+      title={account.name}
+      parent={{ label: 'Usuários', href: '/admin/users' }}
+    >
+      <AccountSection
+        account={account}
+        isCurrentUser={account.id === user.id}
+      />
+    </AdminPage>
+  );
 }
 
-export default function CollaboratorPage({
+export default function UserDetailsPage({
   params,
 }: PageProps<'/admin/users/[userId]'>) {
   return (
-    <Suspense fallback={<AdminLoading />}>
-      <Report params={params} />
+    <Suspense fallback={<UsersLoading />}>
+      <Details params={params} />
     </Suspense>
   );
 }

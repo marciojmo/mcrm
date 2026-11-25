@@ -34,18 +34,27 @@ export async function getBoard(
   });
 }
 
+const MEMBER_SELECT = {
+  id: true,
+  name: true,
+  image: true,
+  banned: true,
+} as const;
+
 export async function listBoardMembers(boardId: string): Promise<BoardUser[]> {
   const board = await prisma.board.findUniqueOrThrow({
     where: { id: boardId },
     select: {
-      owner: { select: { id: true, name: true, image: true } },
+      owner: { select: MEMBER_SELECT },
       members: {
-        select: { user: { select: { id: true, name: true, image: true } } },
+        select: { user: { select: MEMBER_SELECT } },
         orderBy: { user: { name: 'asc' } },
       },
     },
   });
-  return [board.owner, ...board.members.map((member) => member.user)];
+  return [board.owner, ...board.members.map((member) => member.user)].map(
+    ({ banned, ...user }) => ({ ...user, isBanned: banned })
+  );
 }
 
 async function listFreeBoardKeys(name: string) {

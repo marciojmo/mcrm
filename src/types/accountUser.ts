@@ -7,4 +7,6 @@ export interface AccountUser {
   image: string | null;
   role: UserRole;
   isGoogleLinked: boolean;
+  isBanned: boolean;
+  createdAt: string;
 }

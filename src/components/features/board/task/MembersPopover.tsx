@@ -22,8 +22,10 @@ interface MembersPopoverProps {
 export function MembersPopover({ task, users }: MembersPopoverProps) {
   const [query, setQuery] = useState('');
   const { runAction } = useSafeTransition();
-  const matches = users.filter((user) =>
-    user.name.toLowerCase().includes(query.trim().toLowerCase())
+  const matches = users.filter(
+    (user) =>
+      (!user.isBanned || task.memberIds.includes(user.id)) &&
+      user.name.toLowerCase().includes(query.trim().toLowerCase())
   );
 
   return (

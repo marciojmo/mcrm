@@ -9,11 +9,20 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/Card';
+import { DEACTIVATED_MESSAGE } from '@/constants/errorMessages';
 import { getAppName } from '@/services/appSettingService';
 import { getSession } from '@/services/sessionService';
 
 const ACCOUNT_NOT_LINKED_ERROR = 'account_not_linked';
+const BANNED_USER_ERROR = 'BANNED_USER';
 const SIGN_UP_DISABLED_ERROR = 'signup_disabled';
+
+function getSignInErrorMessage(error: string | string[]) {
+  if (error === ACCOUNT_NOT_LINKED_ERROR)
+    return 'Esta conta já existe com senha. Entre com e-mail e senha e vincule o Google pelo menu do usuário.';
+  if (error === BANNED_USER_ERROR) return DEACTIVATED_MESSAGE;
+  return 'Não foi possível entrar com o Google. Tente novamente.';
+}
 
 async function SignInError({
   searchParams,
@@ -25,9 +34,7 @@ async function SignInError({
   if (error === SIGN_UP_DISABLED_ERROR) redirect('/unauthorized');
   return (
     <p role="alert" className="text-sm text-destructive">
-      {error === ACCOUNT_NOT_LINKED_ERROR
-        ? 'Esta conta já existe com senha. Entre com e-mail e senha e vincule o Google pelo menu do usuário.'
-        : 'Não foi possível entrar com o Google. Tente novamente.'}
+      {getSignInErrorMessage(error)}
     </p>
   );
 }

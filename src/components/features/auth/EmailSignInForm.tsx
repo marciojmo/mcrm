@@ -4,12 +4,15 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { DEACTIVATED_MESSAGE } from '@/constants/errorMessages';
 import { authClient } from '@/lib/authClient';
 
+const BANNED_USER_CODE = 'BANNED_USER';
 const TOO_MANY_REQUESTS = 429;
 const INVALID_CREDENTIALS = 401;
 
-function getErrorMessage(status: number) {
+function getErrorMessage(status: number, code?: string) {
+  if (code === BANNED_USER_CODE) return DEACTIVATED_MESSAGE;
   if (status === TOO_MANY_REQUESTS)
     return 'Muitas tentativas. Aguarde um pouco.';
   if (status === INVALID_CREDENTIALS || status === 400)
@@ -30,12 +33,15 @@ export function EmailSignInForm() {
     setErrorMessage(null);
     const { error } = await authClient.signIn.email({ email, password });
     if (error) {
-      setErrorMessage(getErrorMessage(error.status));
+      setErrorMessage(getErrorMessage(error.status, error.code));
       setIsPending(false);
       return;
     }
     router.push('/dashboard');
   }
+
+  const isInvalid =
+    errorMessage !== null && errorMessage !== DEACTIVATED_MESSAGE;
 
   return (
     <form onSubmit={signIn} className="flex flex-col gap-3">
@@ -48,7 +54,7 @@ export function EmailSignInForm() {
           required
           type="email"
           autoComplete="email"
-          aria-invalid={errorMessage ? true : undefined}
+          aria-invalid={isInvalid ? true : undefined}
           aria-describedby={errorMessage ? 'sign-in-error' : undefined}
           value={email}
           onChange={(event) => setEmail(event.target.value)}
@@ -63,7 +69,7 @@ export function EmailSignInForm() {
           required
           type="password"
           autoComplete="current-password"
-          aria-invalid={errorMessage ? true : undefined}
+          aria-invalid={isInvalid ? true : undefined}
           aria-describedby={errorMessage ? 'sign-in-error' : undefined}
           value={password}
           onChange={(event) => setPassword(event.target.value)}

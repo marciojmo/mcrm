@@ -15,23 +15,27 @@ export function CreateUserForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('user');
+  const [isEmailTaken, setIsEmailTaken] = useState(false);
   const { isPending, runAction } = useSafeTransition();
   const toast = useToast();
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    let isEmailTaken = false;
+    setIsEmailTaken(false);
+    let isTaken = false;
     const isCreated = await runAction(
       async () => {
-        ({ isEmailTaken } = await createUser({ name, email, password, role }));
+        ({ isEmailTaken: isTaken } = await createUser({
+          name,
+          email,
+          password,
+          role,
+        }));
       },
       { errorMessage: 'Não foi possível criar o usuário. Tente novamente.' }
     );
     if (!isCreated) return;
-    if (isEmailTaken) {
-      toast.add({ title: 'Este e-mail já está em uso.', priority: 'high' });
-      return;
-    }
+    if (isTaken) return setIsEmailTaken(true);
     setName('');
     setEmail('');
     setPassword('');
@@ -62,9 +66,23 @@ export function CreateUserForm() {
             id="new-user-email"
             required
             type="email"
+            aria-invalid={isEmailTaken ? true : undefined}
+            aria-describedby={isEmailTaken ? 'new-user-email-error' : undefined}
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setIsEmailTaken(false);
+            }}
           />
+          {isEmailTaken && (
+            <p
+              id="new-user-email-error"
+              role="alert"
+              className="text-sm text-destructive"
+            >
+              Este e-mail já está em uso por outro usuário.
+            </p>
+          )}
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="new-user-password" className="text-sm font-medium">
@@ -75,7 +93,7 @@ export function CreateUserForm() {
             required
             type="password"
             autoComplete="new-password"
-            placeholder={`Mínimo de ${MIN_PASSWORD_LENGTH} caracteres`}
+            placeholder={`Mín. ${MIN_PASSWORD_LENGTH} caracteres`}
             minLength={MIN_PASSWORD_LENGTH}
             maxLength={MAX_PASSWORD_LENGTH}
             value={password}
