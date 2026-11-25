@@ -5,8 +5,9 @@ import { Sidebar } from '@/components/layouts/Sidebar';
 import { AppTimeZoneProvider } from '@/components/layouts/AppTimeZoneProvider';
 import { env } from '@/config/env';
 import { getAppName } from '@/services/appSettingService';
+import { hasGoogleAccount } from '@/services/accountUserService';
 import { listBoards } from '@/services/boardService';
-import { isAdminEmail, requireSession } from '@/services/sessionService';
+import { isAdminUser, requireSession } from '@/services/sessionService';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -18,7 +19,7 @@ async function AppSidebar() {
     <Sidebar
       appName={await getAppName()}
       boards={await listBoards(user.id)}
-      isAdmin={isAdminEmail(user.email)}
+      isAdmin={isAdminUser(user)}
     />
   );
 }
@@ -30,12 +31,13 @@ async function AppHeader() {
       <MobileSidebar
         appName={await getAppName()}
         boards={await listBoards(user.id)}
-        isAdmin={isAdminEmail(user.email)}
+        isAdmin={isAdminUser(user)}
       />
       <UserMenu
         name={user.name}
         email={user.email}
         image={user.image ?? null}
+        isGoogleLinked={await hasGoogleAccount(user.id)}
       />
     </>
   );

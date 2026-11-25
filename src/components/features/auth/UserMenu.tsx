@@ -17,14 +17,27 @@ interface UserMenuProps {
   name: string;
   email: string;
   image: string | null;
+  isGoogleLinked: boolean;
 }
 
-export function UserMenu({ name, email, image }: UserMenuProps) {
+export function UserMenu({
+  name,
+  email,
+  image,
+  isGoogleLinked,
+}: UserMenuProps) {
   const router = useRouter();
 
   async function signOut() {
     await authClient.signOut();
     router.push('/');
+  }
+
+  function linkGoogle() {
+    authClient.linkSocial({
+      provider: 'google',
+      callbackURL: window.location.pathname,
+    });
   }
 
   return (
@@ -46,6 +59,9 @@ export function UserMenu({ name, email, image }: UserMenuProps) {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+        <DropdownMenuItem disabled={isGoogleLinked} onClick={linkGoogle}>
+          {isGoogleLinked ? 'Conta Google vinculada' : 'Vincular conta Google'}
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={signOut}>Sair</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

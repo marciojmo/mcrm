@@ -10,6 +10,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --check .",
     "check": "npm run lint && npm run typecheck && npm run format",
+    "create-admin": "node --env-file-if-exists=.env scripts/createAdmin.mjs",
     "postinstall": "prisma generate"
   },
   "dependencies": {

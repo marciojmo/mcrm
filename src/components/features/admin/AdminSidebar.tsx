@@ -7,6 +7,7 @@ import {
   LayoutGridIcon,
   SettingsIcon,
   ShieldIcon,
+  UsersIcon,
 } from 'lucide-react';
 import { UserAvatar } from '@/components/features/board/UserAvatar';
 import { NAV_ACTIVE_CLASS, NAV_ITEM_CLASS } from '@/components/layouts/Sidebar';
@@ -48,6 +49,17 @@ export function AdminSidebar({ collaborators }: AdminSidebarProps) {
         >
           <SettingsIcon className="size-4" />
           Configurações
+        </Link>
+        <Link
+          href="/admin/users"
+          aria-current={pathname === '/admin/users' ? 'page' : undefined}
+          className={cn(
+            NAV_ITEM_CLASS,
+            pathname === '/admin/users' && NAV_ACTIVE_CLASS
+          )}
+        >
+          <UsersIcon className="size-4" />
+          Usuários
         </Link>
         <span className="mt-3 px-2 text-xs font-medium text-muted-foreground">
           Colaboradores

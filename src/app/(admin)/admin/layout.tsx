@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { AdminSidebar } from '@/components/features/admin/AdminSidebar';
 import { UserMenu } from '@/components/features/auth/UserMenu';
+import { hasGoogleAccount } from '@/services/accountUserService';
 import { listUsers } from '@/services/userService';
 import { requireAdmin } from '@/services/sessionService';
 
@@ -16,7 +17,12 @@ async function AdminSidebarLoader() {
 async function AdminHeader() {
   const { user } = await requireAdmin();
   return (
-    <UserMenu name={user.name} email={user.email} image={user.image ?? null} />
+    <UserMenu
+      name={user.name}
+      email={user.email}
+      image={user.image ?? null}
+      isGoogleLinked={await hasGoogleAccount(user.id)}
+    />
   );
 }
 

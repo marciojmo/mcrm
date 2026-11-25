@@ -4,13 +4,6 @@ function readRequired(name: string) {
   return value;
 }
 
-function readList(name: string) {
-  return (process.env[name] ?? '')
-    .split(',')
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean);
-}
-
 function readTimeZone(name: string) {
   const value = process.env[name] || 'America/Sao_Paulo';
   try {
@@ -27,8 +20,6 @@ export const env = Object.freeze({
   BETTER_AUTH_URL: readRequired('BETTER_AUTH_URL'),
   GOOGLE_CLIENT_ID: readRequired('GOOGLE_CLIENT_ID'),
   GOOGLE_CLIENT_SECRET: readRequired('GOOGLE_CLIENT_SECRET'),
-  GOOGLE_WORKSPACE_DOMAIN: readRequired('GOOGLE_WORKSPACE_DOMAIN'),
-  ADMIN_EMAILS: readList('ADMIN_EMAILS'),
   APP_TIME_ZONE: readTimeZone('APP_TIME_ZONE'),
   S3_ENDPOINT: readRequired('S3_ENDPOINT'),
   S3_REGION: readRequired('S3_REGION'),

@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
+import { EmailSignInForm } from '@/components/features/auth/EmailSignInForm';
 import { GoogleSignInButton } from '@/components/features/auth/GoogleSignInButton';
 import {
   Card,
@@ -8,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/Card';
-import { env } from '@/config/env';
 import { getAppName } from '@/services/appSettingService';
 import { getSession } from '@/services/sessionService';
 
@@ -21,7 +21,7 @@ async function SignInError({
   if (!error) return null;
   return (
     <p role="alert" className="text-sm text-destructive">
-      Não foi possível entrar. Use uma conta @{env.GOOGLE_WORKSPACE_DOMAIN}.
+      Não foi possível entrar com o Google. Tente novamente.
     </p>
   );
 }
@@ -46,11 +46,12 @@ export default function Home({ searchParams }: PageProps<'/'>) {
             </Suspense>
           </CardTitle>
           <CardDescription>
-            Entre ou crie sua conta com o Google Workspace da instituição (@
-            {env.GOOGLE_WORKSPACE_DOMAIN}).
+            Entre com seu e-mail e senha ou com sua conta Google.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
+          <EmailSignInForm />
+          <p className="text-center text-xs text-muted-foreground">ou</p>
           <GoogleSignInButton />
           <Suspense>
             <SignInError searchParams={searchParams} />
