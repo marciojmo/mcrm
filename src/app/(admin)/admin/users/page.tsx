@@ -6,13 +6,13 @@ import { requireAdmin } from '@/services/sessionService';
 import UsersLoading from './loading';
 
 async function Users() {
-  const { user } = await requireAdmin();
+  await requireAdmin();
   const users = await listAccountUsers();
   return (
     <div className="flex flex-col gap-6 p-6">
       <h1 className="text-xl font-semibold">Usuários</h1>
       <CreateUserForm />
-      <UserAccountTable users={users} currentUserId={user.id} />
+      <UserAccountTable users={users} />
     </div>
   );
 }

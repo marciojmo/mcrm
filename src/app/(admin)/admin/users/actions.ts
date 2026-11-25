@@ -5,6 +5,9 @@ import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from '@/constants/auth';
 import {
   changeUserRole as changeUserRoleRecord,
   createAccountUser,
+  deactivateUser as deactivateUserRecord,
+  reactivateUser as reactivateUserRecord,
+  updateAccountProfile,
   resetUserPassword as resetUserPasswordRecord,
 } from '@/services/accountUserService';
 import { requireAdmin } from '@/services/sessionService';
@@ -59,5 +62,31 @@ export async function changeUserRole(userId: string, role: UserRole) {
   const { user } = await requireAdmin();
   if (userId === user.id) throw new Error('Cannot change own role');
   await changeUserRoleRecord(cleanText(userId), cleanRole(role));
-  revalidatePath('/admin/users');
+  revalidatePath('/admin', 'layout');
+}
+
+export async function updateUserProfile(
+  userId: string,
+  input: { name: string; email: string }
+) {
+  await requireAdmin();
+  const result = await updateAccountProfile(cleanText(userId), {
+    name: cleanText(input.name),
+    email: cleanText(input.email),
+  });
+  revalidatePath('/admin', 'layout');
+  return result;
+}
+
+export async function deactivateUser(userId: string) {
+  const { user } = await requireAdmin();
+  if (userId === user.id) throw new Error('Cannot deactivate yourself');
+  await deactivateUserRecord(cleanText(userId));
+  revalidatePath('/admin', 'layout');
+}
+
+export async function reactivateUser(userId: string) {
+  await requireAdmin();
+  await reactivateUserRecord(cleanText(userId));
+  revalidatePath('/admin', 'layout');
 }
